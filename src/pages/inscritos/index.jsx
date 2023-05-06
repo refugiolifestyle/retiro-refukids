@@ -10,7 +10,7 @@ export default function Index() {
 
   useEffect(() => {
     let query = ref(firebaseDatabase, 'inscritos')
-    
+
     return onValue(query, (snapshot) => {
       setInscritos(snapshot.val())
     })
@@ -24,6 +24,13 @@ export default function Index() {
       ]
     }, [])
 
+  inscritosPrepared.sort(function (a, b) {
+    let numeroRedeA = a.rede.replace('Rede ', '')
+    let numeroRedeB = b.rede.replace('Rede ', '')
+
+    return Number.parseInt(numeroRedeA) > Number.parseInt(numeroRedeB)  ? 1 : -1
+  })
+
   return <Page
     title="Inscritos"
     actions={<a
@@ -32,7 +39,7 @@ export default function Index() {
       Novas inscrições
     </a>}
   >
-    <DataTable value={inscritosPrepared} emptyMessage='Nenhuma inscrição realizada'>
+    <DataTable value={inscritosPrepared || []} emptyMessage='Nenhuma inscrição realizada' paginator rows={15}>
       <Column field="rede" header="Rede"></Column>
       <Column field="cargo" header="Cargo"></Column>
       <Column field="nome" header="Nome"></Column>
