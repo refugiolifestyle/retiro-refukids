@@ -6,7 +6,7 @@ import { Page } from '../../components/page';
 import { firebaseDatabase } from '../../configs/firebase';
 
 export default function Index() {
-  const [inscritos, setInscritos] = useState({})
+  const [inscritos, setInscritos] = useState()
 
   useEffect(() => {
     let query = ref(firebaseDatabase, 'inscritos')
@@ -16,20 +16,22 @@ export default function Index() {
     })
   }, [])
 
-  let inscritosPrepared = Object.values(inscritos)
-    .reduce((am, rede) => {
-      return [
-        ...Object.values(rede),
-        ...am
-      ]
-    }, [])
+  if (inscritos) {
+    let inscritosPrepared = Object.values(inscritos)
+      .reduce((am, rede) => {
+        return [
+          ...Object.values(rede),
+          ...am
+        ]
+      }, [])
 
-  inscritosPrepared.sort(function (a, b) {
-    let numeroRedeA = a.rede.replace('Rede ', '')
-    let numeroRedeB = b.rede.replace('Rede ', '')
+    inscritosPrepared.sort(function (a, b) {
+      let numeroRedeA = a.rede.replace('Rede ', '')
+      let numeroRedeB = b.rede.replace('Rede ', '')
 
-    return Number.parseInt(numeroRedeA) > Number.parseInt(numeroRedeB)  ? 1 : -1
-  })
+      return Number.parseInt(numeroRedeA) > Number.parseInt(numeroRedeB) ? 1 : -1
+    })
+  }
 
   return <Page
     title="Inscritos"
@@ -39,7 +41,7 @@ export default function Index() {
       Novas inscrições
     </a>}
   >
-    <DataTable value={inscritosPrepared || []} emptyMessage='Nenhuma inscrição realizada' paginator rows={15}>
+    <DataTable value={inscritos ? inscritosPrepared : []} emptyMessage='Nenhuma inscrição realizada' paginator rows={15}>
       <Column field="rede" header="Rede"></Column>
       <Column field="cargo" header="Cargo"></Column>
       <Column field="nome" header="Nome"></Column>
