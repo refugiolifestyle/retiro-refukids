@@ -16,8 +16,9 @@ export default function Index() {
     })
   }, [])
 
+  let inscritosPrepared = []
   if (inscritos) {
-    let inscritosPrepared = Object.values(inscritos)
+    inscritosPrepared = Object.values(inscritos)
       .reduce((am, rede) => {
         return [
           ...Object.values(rede),
@@ -41,7 +42,7 @@ export default function Index() {
       Novas inscrições
     </a>}
   >
-    <DataTable value={inscritos ? inscritosPrepared : []} emptyMessage='Nenhuma inscrição realizada' paginator rows={15}>
+    <DataTable value={inscritosPrepared} emptyMessage='Nenhuma inscrição realizada' paginator rows={15}>
       <Column field="rede" header="Rede"></Column>
       <Column field="cargo" header="Cargo"></Column>
       <Column field="nome" header="Nome"></Column>
