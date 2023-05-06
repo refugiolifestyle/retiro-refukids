@@ -13,7 +13,7 @@ const dataColumns = [
   { field: 'nascimento', header: 'Dt. Nascimento', sortable: true },
   { field: 'telefone', header: 'Telefone', sortable: false },
   { field: 'observacao', header: 'Observação', sortable: false },
-  { field: 'crianca', header: 'Responsável por', sortable: false },
+  { field: 'criancas', header: 'Responsável por', sortable: false },
 ];
 
 export default function TableInscritos({ inscritos, loading, actions }) {

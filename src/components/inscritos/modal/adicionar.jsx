@@ -4,6 +4,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputMask } from 'primereact/inputmask';
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from 'primereact/inputtextarea';
+import { MultiSelect } from 'primereact/multiselect';
 import { RadioButton } from "primereact/radiobutton";
 import { SelectButton } from 'primereact/selectbutton';
 import { classNames } from "primereact/utils";
@@ -127,14 +128,16 @@ export const NovoModalInscrito = ({ adicionarInscrito, criancas}) => {
               tipoInscricao === 'RESPONSAVEL'
                 ? <>
                   <div className="flex flex-col sm:flex-row py-2">
-                    <label className="text-base w-52">Criança *</label>
-                    <Dropdown 
-                      {...register('crianca', { required: tipoInscricao === 'RESPONSAVEL' })} 
-                      value={watch('crianca')} 
+                    <label className="text-base w-52">Crianças *</label>
+                    <MultiSelect 
+                      {...register('criancas', { required: tipoInscricao === 'RESPONSAVEL' })} 
+                      value={watch('criancas')} 
                       options={criancas} 
                       optionLabel="nome" 
                       optionValue="nome" 
-                      emptyMessage="Nenhuma criança adicionada"
+                      filter
+                      emptyFilterMessage="Nenhuma criança adicionada"
+                      placeholder="Selecione suas crianças"
                       className="flex-1" />
                   </div>
                 </>
