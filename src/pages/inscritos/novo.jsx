@@ -13,14 +13,14 @@ const deparaCargo = {
 }
 
 export default function Index() {
-  const {parse} = useInscrito();
+  const { parse } = useInscrito();
   const [inscritos, setInscritos] = useState([]);
 
   const adicionarInscrito = (data, tipoInscricao) => {
     let newInscritos = [
-      parse({ 
+      parse({
         ...data,
-        cargo: deparaCargo[tipoInscricao] 
+        cargo: deparaCargo[tipoInscricao]
       }),
       ...inscritos
     ]
@@ -31,11 +31,15 @@ export default function Index() {
 
   const setupBeforeUnloadListener = () => {
     window.addEventListener("beforeunload", (ev) => {
-        ev.preventDefault();
-        return ev.returnValue = 'Você tem certeza que deseja sair?';
+      ev.preventDefault();
+      return ev.returnValue = 'Você tem certeza que deseja sair?';
     });
-};
+  };
 
+  const removeInscrito = linha => {
+    setInscritos(oldInscritos => oldInscritos
+      .filter(inscrito => inscrito.nome !== linha.nome))
+  }
 
   return <Page
     title="Adicione os inscritos que você quer cadastrar"
@@ -56,6 +60,13 @@ export default function Index() {
     </div>}>
     <TableInscritos
       inscritos={inscritos}
-      loading={false} />
+      loading={false}
+      actions={linha =>
+        <button
+          onClick={() => removeInscrito(linha)}
+          className="bg-red-700 text-white px-3 py-2 rounded-md text-sm font-bold">
+          X
+        </button>
+      } />
   </Page>
 }

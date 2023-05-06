@@ -16,10 +16,10 @@ const dataColumns = [
   { field: 'crianca', header: 'Responsável por', sortable: false },
 ];
 
-export default function TableInscritos({ inscritos, loading }) {
+export default function TableInscritos({ inscritos, loading, actions }) {
   let initColumnsVisible = dataColumns
     .filter(c => !["telefone", "nascimento", "observacao"].includes(c.field));
-    
+
   const [visibleColumns, setVisibleColumns] = useState(initColumnsVisible);
 
   const onColumnToggle = (event) => {
@@ -69,6 +69,13 @@ export default function TableInscritos({ inscritos, loading }) {
         filterPlaceholder={`Filtrar por ${col.header}`}
         header={col.header}
         sortable={col.sortable} />)
+    }
+    {
+      actions
+        ? <Column
+          header="#"
+          body={actions} />
+        : null
     }
   </DataTable>
 }
