@@ -1,5 +1,6 @@
 import { ref, set } from 'firebase/database';
 import { useRouter } from 'next/router';
+import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { useState } from "react";
 import { useForm } from 'react-hook-form';
@@ -14,6 +15,7 @@ const deparaValores = {
 export const FinalizarModalInscrito = ({ inscritos }) => {
   const router = useRouter();
   const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const hideModal = () => {
@@ -21,6 +23,8 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
   }
 
   const concluirInscricao = async data => {
+    setLoading(true);
+
     let reader = new FileReader();
     reader.onload = async ({ target }) => {
       for (let inscrito of inscritos) {
@@ -31,6 +35,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
         });
       }
 
+      setLoading(false);
       router.replace('/inscritos');
     }
 
@@ -73,11 +78,12 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
             className="text-black px-3 py-2 rounded-md text-sm">
             Cancelar
           </button>
-          <button
+          <Button
             type="submit"
-            className="bg-indigo-700 text-white px-3 py-2 rounded-md text-base font-medium">
+            loading={loading}
+            className="bg-indigo-700 text-white px-3 py-2 rounded-md text-base font-medium gap-2">
             Concluir inscrição
-          </button>
+          </Button>
         </div>
       </form>
     </Dialog>
