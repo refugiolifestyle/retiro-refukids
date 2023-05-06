@@ -4,6 +4,7 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { useState } from "react";
 import { useForm } from 'react-hook-form';
+import { v4 } from 'uuid';
 import { firebaseDatabase } from '../../../configs/firebase';
 
 const deparaValores = {
@@ -27,11 +28,24 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
 
     let reader = new FileReader();
     reader.onload = async ({ target }) => {
+      let uuid = v4();
+      let comprovantePath = `comprovante/${uuid}`;
+      let comprovanteRef = ref(firebaseDatabase, comprovantePath);
+      await set(comprovanteRef, {
+        inscritos: inscritos.map(({ rede, cargo, nome }) => ({ rede, cargo, nome })),
+        comprovante: target.result,
+        valor: getAmount(),
+        data: new Date().toLocaleString("pt-BR")
+      });
+
       for (let inscrito of inscritos) {
         let inscritoRef = ref(firebaseDatabase, `inscritos/${inscrito.rede}/${inscrito.nome}`);
         await set(inscritoRef, {
           ...inscrito,
-          pagamento: target.result
+          comprovante: {
+            referencia: comprovantePath,
+            arquivo: target.result
+          }
         });
       }
 
@@ -42,7 +56,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
     reader.readAsDataURL(data.comprovante.item(0));
   }
 
-  let amount = inscritos.reduce((am, inscrito) => {
+  let getAmount = () => inscritos.reduce((am, inscrito) => {
     return am + deparaValores[inscrito.cargo]
   }, 0.0);
 
@@ -62,7 +76,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
         <div className="flex flex-col sm:flex-row py-2">
           <label className="text-base font-semibold w-64">Valor total</label>
           <div className="flex flex-1 flex-col">
-            {new Intl.NumberFormat('pt-BR', { style: "currency", currency: "BRL" }).format(amount)}
+            {new Intl.NumberFormat('pt-BR', { style: "currency", currency: "BRL" }).format(getAmount())}
           </div>
         </div>
         <div className="flex flex-col sm:flex-row py-2">
