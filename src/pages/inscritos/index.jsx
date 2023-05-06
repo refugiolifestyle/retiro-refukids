@@ -1,4 +1,5 @@
 import { onValue, ref } from 'firebase/database';
+import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { useEffect, useState } from 'react';
@@ -7,12 +8,13 @@ import { firebaseDatabase } from '../../configs/firebase';
 
 export default function Index() {
   const [inscritos, setInscritos] = useState()
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let query = ref(firebaseDatabase, 'inscritos')
-
     return onValue(query, (snapshot) => {
       setInscritos(snapshot.val())
+      setLoading(false);
     })
   }, [])
 
@@ -42,13 +44,81 @@ export default function Index() {
       Novas inscrições
     </a>}
   >
-    <DataTable value={inscritosPrepared} emptyMessage='Nenhuma inscrição realizada' paginator rows={15}>
-      <Column field="rede" header="Rede"></Column>
-      <Column field="cargo" header="Cargo"></Column>
-      <Column field="nome" header="Nome"></Column>
-      <Column field="sexo" header="Sexo"></Column>
-      <Column field="telefone" header="Telefone"></Column>
-      <Column field="crianca" header="Responsável de"></Column>
+    <DataTable
+      value={inscritosPrepared}
+      emptyMessage='Nenhuma inscrição realizada'
+      loading={loading}
+      paginator
+      rows={15}
+      sortMode="multiple"
+      removableSort
+      dataKey="nome"
+      filters={{
+        rede: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }]  },
+        cargo: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }]  },
+        nome: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }]  },
+        sexo: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }]  },
+        telefone: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }]  },
+        crianca: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }]  }
+      }}>
+      <Column
+        field="rede"
+        filterField="rede"
+        filter
+        filterApply={props => <button className='bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium' onClick={props.filterApplyCallback}>Filtrar</button>}
+        filterClear={props => <button className='bg-white border border-indigo-600 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium' onClick={props.filterClearCallback}>Limpar</button>}
+        showFilterMenuOptions={false}
+        filterPlaceholder='Filtrar por Rede'
+        header="Rede"
+        sortable></Column>
+      <Column
+        field="cargo"
+        filterField="cargo"
+        filter
+        filterApply={props => <button className='bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium' onClick={props.filterApplyCallback}>Filtrar</button>}
+        filterClear={props => <button className='bg-white border border-indigo-600 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium' onClick={props.filterClearCallback}>Limpar</button>}
+        showFilterMenuOptions={false}
+        filterPlaceholder='Filtrar por Cargo'
+        header="Cargo"
+        sortable></Column>
+      <Column
+        field="nome"
+        filterField="nome"
+        filter
+        filterApply={props => <button className='bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium' onClick={props.filterApplyCallback}>Filtrar</button>}
+        filterClear={props => <button className='bg-white border border-indigo-600 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium' onClick={props.filterClearCallback}>Limpar</button>}
+        showFilterMenuOptions={false}
+        filterPlaceholder='Filtrar por Nome'
+        header="Nome"
+        sortable></Column>
+      <Column
+        field="sexo"
+        filterField="sexo"
+        filter
+        filterApply={props => <button className='bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium' onClick={props.filterApplyCallback}>Filtrar</button>}
+        filterClear={props => <button className='bg-white border border-indigo-600 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium' onClick={props.filterClearCallback}>Limpar</button>}
+        showFilterMenuOptions={false}
+        filterPlaceholder='Filtrar por Sexo'
+        header="Sexo"
+        sortable></Column>
+      <Column
+        field="telefone"
+        filterField="telefone"
+        filter
+        filterApply={props => <button className='bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium' onClick={props.filterApplyCallback}>Filtrar</button>}
+        filterClear={props => <button className='bg-white border border-indigo-600 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium' onClick={props.filterClearCallback}>Limpar</button>}
+        showFilterMenuOptions={false}
+        filterPlaceholder='Filtrar por Telefone'
+        header="Telefone"></Column>
+      <Column
+        field="crianca"
+        filterField="crianca"
+        filter
+        filterApply={props => <button className='bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium' onClick={props.filterApplyCallback}>Filtrar</button>}
+        filterClear={props => <button className='bg-white border border-indigo-600 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium' onClick={props.filterClearCallback}>Limpar</button>}
+        showFilterMenuOptions={false}
+        filterPlaceholder='Filtrar por Responsável de'
+        header="Responsável de"></Column>
     </DataTable>
   </Page>
 }
