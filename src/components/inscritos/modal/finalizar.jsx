@@ -25,6 +25,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
 
   const concluirInscricao = async data => {
     setLoading(true);
+    console.log(inscritos)
 
     let reader = new FileReader();
     reader.onload = async ({ target }) => {
@@ -39,6 +40,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
       });
 
       for (let inscrito of inscritos) {
+        console.log(inscrito)
         let inscritoRef = ref(firebaseDatabase, `inscritos/${inscrito.rede}/${inscrito.nome}`);
         await set(inscritoRef, {
           ...inscrito,

@@ -100,7 +100,7 @@ export const NovoModalInscrito = ({ adicionarInscrito, criancas}) => {
                     <label className="text-base w-52">Dt. Nascimento *</label>
                     <div className="flex flex-1 flex-col">
                       <Calendar {...register('nascimento', { required: tipoInscricao === 'CRIANCA' })} dateFormat="dd/mm/yy" />
-                      {errors.nascimento && <span className="text text-sm mt-1-red-700">Campo obrigatório</span>}
+                      {errors.nascimento && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
                     </div>
                   </div>
 
