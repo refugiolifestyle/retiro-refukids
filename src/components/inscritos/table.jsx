@@ -47,6 +47,8 @@ export default function TableInscritos({ inscritos, loading, actions }) {
     </div>}
     paginator
     rows={15}
+    multiSortMeta={[{field: 'rede', order: 1}]}
+    sortOrder={1}
     sortMode="multiple"
     removableSort
     dataKey="nome"
