@@ -34,7 +34,8 @@ export default function TableInscritos({ inscritos, loading, actions }) {
     value={inscritos}
     emptyMessage='Nenhuma inscrição realizada'
     loading={loading}
-    header={<div className="flex justify-end items-center">
+    header={<div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+      <span>Total de registros: {inscritos.length} {inscritos.length === 1 ? "inscrito" : "inscritos"}</span>
       <MultiSelect
         value={visibleColumns}
         options={dataColumns}
