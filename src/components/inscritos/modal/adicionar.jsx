@@ -4,6 +4,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputMask } from 'primereact/inputmask';
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from 'primereact/inputtextarea';
+import { Message } from 'primereact/message';
 import { MultiSelect } from 'primereact/multiselect';
 import { RadioButton } from "primereact/radiobutton";
 import { SelectButton } from 'primereact/selectbutton';
@@ -12,7 +13,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRedesService } from "../../../services/useRedesService";
 
-export const NovoModalInscrito = ({ adicionarInscrito, criancas}) => {
+export const NovoModalInscrito = ({ adicionarInscrito, criancas }) => {
   const redes = useRedesService();
 
   const [visible, setVisible] = useState(false);
@@ -67,6 +68,13 @@ export const NovoModalInscrito = ({ adicionarInscrito, criancas}) => {
             Responsável
           </label>
         </div>
+
+        
+        {
+          tipoInscricao === 'RESPONSAVEL'
+          ? <Message className='w-full mt-8' severity="info" text="Primeiro realize o cadastro das suas crianças" /> 
+          : null 
+        }
 
         {tipoInscricao !== null
           ? <>
@@ -129,16 +137,19 @@ export const NovoModalInscrito = ({ adicionarInscrito, criancas}) => {
                 ? <>
                   <div className="flex flex-col sm:flex-row py-2">
                     <label className="text-base w-52">Crianças *</label>
-                    <MultiSelect 
-                      {...register('criancas', { required: tipoInscricao === 'RESPONSAVEL' })} 
-                      value={watch('criancas')} 
-                      options={criancas} 
-                      optionLabel="nome" 
-                      optionValue="nome" 
-                      filter
-                      emptyFilterMessage="Nenhuma criança adicionada"
-                      placeholder="Selecione suas crianças"
-                      className="flex-1" />
+                    <div className="flex flex-1 flex-col">
+                      <MultiSelect
+                        {...register('criancas', { required: tipoInscricao === 'RESPONSAVEL' })}
+                        value={watch('criancas')}
+                        options={criancas}
+                        optionLabel="nome"
+                        optionValue="nome"
+                        filter
+                        emptyFilterMessage="Nenhuma criança adicionada"
+                        placeholder="Selecione suas crianças"
+                        className="flex-1" />
+                      {errors.criancas && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
+                    </div>
                   </div>
                 </>
                 : null
@@ -158,6 +169,6 @@ export const NovoModalInscrito = ({ adicionarInscrito, criancas}) => {
           </>
           : null}
       </form>
-    </Dialog>
+    </Dialog >
   </>
 }

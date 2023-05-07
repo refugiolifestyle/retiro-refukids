@@ -2,7 +2,8 @@ import { ref, set } from 'firebase/database';
 import { useRouter } from 'next/router';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
-import { useState } from "react";
+import { Toast } from 'primereact/toast';
+import { useRef, useState } from "react";
 import { useForm } from 'react-hook-form';
 import { v4 } from 'uuid';
 import { firebaseDatabase } from '../../../configs/firebase';
@@ -15,17 +16,18 @@ const deparaValores = {
 
 export const FinalizarModalInscrito = ({ inscritos }) => {
   const router = useRouter();
+  const toast = useRef(null);
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   const hideModal = () => {
     setVisible(false);
+    reset();
   }
 
   const concluirInscricao = async data => {
     setLoading(true);
-    console.log(inscritos)
 
     let reader = new FileReader();
     reader.onload = async ({ target }) => {
@@ -51,8 +53,14 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
         });
       }
 
-      setLoading(false);
-      router.replace('/inscritos');
+      toast.current.show({ severity: 'success', summary: 'Sucesso', detail: 'Cadastro finalizado com sucesso' });
+      
+      setTimeout(() => {      
+        setLoading(false);
+        hideModal();
+
+        router.replace('/inscritos');
+      }, 3000);
     }
 
     reader.readAsDataURL(data.comprovante.item(0));
@@ -63,6 +71,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
   }, 0.0);
 
   return <>
+    <Toast ref={toast} />
     <button
       onClick={() => setVisible(true)}
       className="bg-white text-black px-3 py-2 rounded-md text-sm font-medium">
@@ -97,6 +106,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
           <Button
             type="submit"
             loading={loading}
+            disabled={loading}
             className="bg-indigo-700 text-white px-3 py-2 rounded-md text-base font-medium gap-2">
             Concluir inscrição
           </Button>
