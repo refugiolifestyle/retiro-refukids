@@ -40,6 +40,7 @@ export default function TableInscritos({ inscritos, loading, actions }) {
         options={dataColumns}
         optionLabel="header"
         placeholder="Colunas visíveis"
+        className="w-full max-w-xs"
         onChange={onColumnToggle}
         maxSelectedLabels={3}
         display="chip" />
