@@ -38,7 +38,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
       setLoading(false);
       hideModal();
 
-      router.replace('/inscritos/novo');
+      router.replace('/inscritos');
     }, 3000);
   }
 
