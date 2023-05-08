@@ -2,44 +2,62 @@ import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { MultiSelect } from 'primereact/multiselect';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRedesService } from '../../services/useRedesService';
 
 const dataColumns = [
-  { field: 'rede', header: 'Rede', sortable: true },
-  { field: 'cargo', header: 'Cargo', sortable: true },
-  { field: 'nome', header: 'Nome', sortable: true },
-  { field: 'sexo', header: 'Sexo', sortable: true },
-  { field: 'idade', header: 'Idade', sortable: true },
-  { field: 'nascimento', header: 'Dt. Nascimento', sortable: true },
-  { field: 'telefone', header: 'Telefone', sortable: false },
-  { field: 'observacao', header: 'Observação', sortable: false },
-  { field: 'criancas', header: 'Responsável por', sortable: false },
+  'Rede',
+  'Cargo',
+  'Nome',
+  'Sexo',
+  'Idade',
+  'Dt. Nascimento',
+  'Telefone',
+  'Observação',
+  'Responsável por'
 ];
 
 export default function TableInscritos({ inscritos, loading, actions }) {
   let initColumnsVisible = dataColumns
-    .filter(c => !["telefone", "nascimento", "observacao"].includes(c.field));
+    .filter(c => !["Telefone", "Dt. Nascimento", "Observação"].includes(c));
 
+  const redes = useRedesService();
   const [visibleColumns, setVisibleColumns] = useState(initColumnsVisible);
+  const [countRealRows, setCountRealRows] = useState(0);
+  const [filters, setFilter] = useState({
+    rede: { value: null, matchMode: FilterMatchMode.IN },
+    cargo: { value: null, matchMode: FilterMatchMode.IN },
+    nome: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
+    sexo: { value: null, matchMode: FilterMatchMode.IN },
+    telefone: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
+    nascimento: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
+    idade: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+    observacao: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
+    criancas: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] }
+  });
+
+  useEffect(() => {
+    setCountRealRows(inscritos.length)
+  }, [inscritos])
 
   const onColumnToggle = (event) => {
     let selectedColumns = event.value;
     let orderedSelectedColumns = dataColumns.filter((col) =>
-      selectedColumns.some((sCol) => sCol.field === col.field));
+      selectedColumns.some((sCol) => sCol === col));
 
     setVisibleColumns(orderedSelectedColumns);
   };
 
   return <DataTable
     value={inscritos}
+    onValueChange={data => setCountRealRows(data.length)}
     emptyMessage='Nenhuma inscrição realizada'
     loading={loading}
     header={<div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-      <span>Total de registros: {inscritos.length} {inscritos.length === 1 ? "inscrito" : "inscritos"}</span>
+      <span>Total de registros: {countRealRows} {countRealRows === 1 ? "inscrito" : "inscritos"}</span>
       <MultiSelect
         value={visibleColumns}
         options={dataColumns}
-        optionLabel="header"
         placeholder="Colunas visíveis"
         className="w-full max-w-xs"
         onChange={onColumnToggle}
@@ -48,32 +66,103 @@ export default function TableInscritos({ inscritos, loading, actions }) {
     </div>}
     paginator
     rows={15}
-    multiSortMeta={[{field: 'rede', order: 1}]}
+    multiSortMeta={[{ field: 'rede', order: 1 }]}
     sortOrder={1}
     sortMode="multiple"
     removableSort
     dataKey="nome"
-    filters={{
-      rede: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-      cargo: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-      nome: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-      sexo: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-      telefone: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-      crianca: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] }
-    }}>
-    {
-      visibleColumns.map(col => <Column
-        key={col.field}
-        field={col.field}
-        filterField={col.field}
+    filters={filters}>
+    {visibleColumns.includes('Rede')
+      ? <Column
+        key="rede"
+        field="rede"
         filter
-        filterApply={props => <button className='bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium' onClick={props.filterApplyCallback}>Filtrar</button>}
-        filterClear={props => <button className='bg-white border border-indigo-600 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium' onClick={props.filterClearCallback}>Limpar</button>}
-        showFilterMenuOptions={false}
-        filterPlaceholder={`Filtrar por ${col.header}`}
-        header={col.header}
-        sortable={col.sortable} />)
-    }
+        filterField="rede"
+        filterElement={options => <MultiSelect filter value={options.value} options={redes} onChange={(e) => options.filterCallback(e.value)} placeholder="Filtrar por Rede" className="p-column-filter" />}
+        showFilterMatchModes={false}
+        header="Rede"
+        sortable />
+      : null}
+    {visibleColumns.includes('Cargo')
+      ? <Column
+        key="cargo"
+        field="cargo"
+        filter
+        filterField="cargo"
+        filterElement={options => <MultiSelect filter value={options.value} options={['Servo', 'Criança', 'Responsável']} onChange={(e) => options.filterCallback(e.value)} placeholder="Filtrar por Cargo" className="p-column-filter" />}
+        showFilterMatchModes={false}
+        header="Cargo"
+        sortable />
+      : null}
+    {visibleColumns.includes('Nome')
+      ? <Column
+        key="nome"
+        field="nome"
+        filterField="nome"
+        filter
+        filterPlaceholder="Filtrar por Nome"
+        header="Nome"
+        sortable />
+      : null}
+    {visibleColumns.includes('Sexo')
+      ? <Column
+        key="sexo"
+        field="sexo"
+        filter
+        filterField="sexo"
+        filterElement={options => <MultiSelect filter value={options.value} options={['Masculino', 'Feminino']} onChange={(e) => options.filterCallback(e.value)} placeholder="Filtrar por Sexo" className="p-column-filter" />}
+        showFilterMatchModes={false}
+        header="Sexo"
+        sortable />
+      : null}
+    {visibleColumns.includes('Idade')
+      ? <Column
+        key="idade"
+        field="idade"
+        filterField="idade"
+        filter
+        filterPlaceholder="Filtrar por Idade"
+        dataType="numeric"
+        header="Idade"
+        sortable />
+      : null}
+    {visibleColumns.includes('Dt. Nascimento')
+      ? <Column
+        key="nascimento"
+        field="nascimento"
+        filterField="nascimento"
+        filter
+        filterPlaceholder="Filtrar por Dt. Nascimento"
+        header="Dt. Nascimento" />
+      : null}
+    {visibleColumns.includes('Telefone')
+      ? <Column
+        key="telefone"
+        field="telefone"
+        filterField="telefone"
+        filter
+        filterPlaceholder="Filtrar por Telefone"
+        header="Telefone" />
+      : null}
+    {visibleColumns.includes('Observação')
+      ? <Column
+        key="observacao"
+        field="observacao"
+        filterField="observacao"
+        filter
+        filterPlaceholder="Filtrar por Observação"
+        header="Observação" 
+        sortable />
+      : null}
+    {visibleColumns.includes('Responsável por')
+      ? <Column
+        key="criancas"
+        field="criancas"
+        filterField="criancas"
+        filter
+        filterPlaceholder="Filtrar por Responsável por"
+        header="Responsável por" />
+      : null}
     {
       actions
         ? <Column
