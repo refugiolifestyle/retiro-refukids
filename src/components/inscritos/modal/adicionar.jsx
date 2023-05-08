@@ -11,10 +11,12 @@ import { SelectButton } from 'primereact/selectbutton';
 import { classNames } from "primereact/utils";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useInscritosService } from '../../../services/useInscritosService';
 import { useRedesService } from "../../../services/useRedesService";
 
-export const NovoModalInscrito = ({ adicionarInscrito, criancas }) => {
+export const NovoModalInscrito = ({ adicionarInscrito }) => {
   const redes = useRedesService();
+  const { inscritos, loading } = useInscritosService();
 
   const [visible, setVisible] = useState(false);
   const [tipoInscricao, setTipoInscricao] = useState(null);
@@ -31,6 +33,9 @@ export const NovoModalInscrito = ({ adicionarInscrito, criancas }) => {
 
     setVisible(false);
   }
+
+  let criancasSaved = inscritos.filter(i => i.cargo === 'Criança');
+  criancasSaved.sort((a, b) => a.nome.localeCompare(b.nome))
 
   return <>
     <button
@@ -141,12 +146,12 @@ export const NovoModalInscrito = ({ adicionarInscrito, criancas }) => {
                       <MultiSelect
                         {...register('criancas', { required: tipoInscricao === 'RESPONSAVEL' })}
                         value={watch('criancas')}
-                        options={criancas}
+                        options={criancasSaved}
                         optionLabel="nome"
                         optionValue="nome"
                         filter
                         emptyFilterMessage="Nenhuma criança adicionada"
-                        placeholder="Selecione suas crianças"
+                        placeholder={loading ? "Carregando..." : "Selecione suas crianças"}
                         className="flex-1" />
                       {errors.criancas && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
                     </div>

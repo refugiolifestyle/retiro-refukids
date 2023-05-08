@@ -14,18 +14,18 @@ const deparaCargo = {
 
 export default function Index() {
   const { parse } = useInscrito();
-  const [inscritos, setInscritos] = useState([]);
+  const [inscritosAdded, setInscritosAdded] = useState([]);
 
   const adicionarInscrito = (data, tipoInscricao) => {
-    let newInscritos = [
+    let newInscritosAdded = [
       parse({
         ...data,
         cargo: deparaCargo[tipoInscricao]
       }),
-      ...inscritos
+      ...inscritosAdded
     ]
 
-    setInscritos(newInscritos)
+    setInscritosAdded(newInscritosAdded)
     setupBeforeUnloadListener()
   }
 
@@ -37,7 +37,7 @@ export default function Index() {
   };
 
   const removeInscrito = linha => {
-    setInscritos(oldInscritos => oldInscritos
+    setInscritosAdded(oldInscritosAdded => oldInscritosAdded
       .filter(inscrito => inscrito.nome !== linha.nome))
   }
 
@@ -50,16 +50,15 @@ export default function Index() {
         Cancelar
       </a>
       <NovoModalInscrito
-        adicionarInscrito={adicionarInscrito}
-        criancas={inscritos.filter(i => i.cargo === 'Criança')} />
+        adicionarInscrito={adicionarInscrito} />
       {
-        inscritos.length
-          ? <FinalizarModalInscrito inscritos={inscritos} />
+        inscritosAdded.length
+          ? <FinalizarModalInscrito inscritos={inscritosAdded} />
           : null
       }
     </div>}>
     <TableInscritos
-      inscritos={inscritos}
+      inscritos={inscritosAdded}
       loading={false}
       actions={linha =>
         <button
