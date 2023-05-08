@@ -50,7 +50,8 @@ export default function Index() {
         Cancelar
       </a>
       <NovoModalInscrito
-        adicionarInscrito={adicionarInscrito} />
+        adicionarInscrito={adicionarInscrito}
+        inscritosAdded={inscritosAdded} />
       {
         inscritosAdded.length
           ? <FinalizarModalInscrito inscritos={inscritosAdded} />

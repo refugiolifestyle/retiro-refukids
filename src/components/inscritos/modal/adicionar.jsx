@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form";
 import { useInscritosService } from '../../../services/useInscritosService';
 import { useRedesService } from "../../../services/useRedesService";
 
-export const NovoModalInscrito = ({ adicionarInscrito }) => {
+export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
   const redes = useRedesService();
   const { inscritos, loading } = useInscritosService();
 
@@ -34,7 +34,11 @@ export const NovoModalInscrito = ({ adicionarInscrito }) => {
     setVisible(false);
   }
 
-  let criancasSaved = inscritos.filter(i => i.cargo === 'Criança');
+  let criancasSaved = []
+    .concat(inscritosAdded)
+    .concat(inscritos)
+    .filter(i => i.cargo === 'Criança');
+    
   criancasSaved.sort((a, b) => a.nome.localeCompare(b.nome))
 
   return <>
