@@ -6,10 +6,11 @@ import { InputText } from 'primereact/inputtext';
 import { RadioButton } from 'primereact/radiobutton';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from 'react-hook-form';
 import { v4 } from 'uuid';
 import { firebaseDatabase } from '../../../configs/firebase';
+import { useConfigService } from '../../../services/useConfigService';
 
 const deparaValores = {
   "Servo": 110,
@@ -23,7 +24,12 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tipoPagamento, setTipoPagamento] = useState(null);
+  const { permitirDinheiro } = useConfigService();
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
+
+  useEffect(() => {
+    setTipoPagamento(null);
+  }, [permitirDinheiro]);
 
   const hideModal = () => {
     setVisible(false);
@@ -124,13 +130,17 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
           <RadioButton inputId="PIXTipoId" value="PIX" onChange={(e) => setTipoPagamento('PIX')} checked={tipoPagamento === 'PIX'} />
           PIX
         </label>
-        <label htmlFor="DinheiroTipoId" className={classNames(
-          tipoPagamento === 'DINHEIRO' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
-          "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
-        )}>
-          <RadioButton inputId="DinheiroTipoId" value="DINHEIRO" onChange={(e) => setTipoPagamento('DINHEIRO')} checked={tipoPagamento === 'DINHEIRO'} />
-          Dinheiro
-        </label>
+        {
+          permitirDinheiro === true
+            ? <label htmlFor="DinheiroTipoId" className={classNames(
+              tipoPagamento === 'DINHEIRO' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
+              "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
+            )}>
+              <RadioButton inputId="DinheiroTipoId" value="DINHEIRO" onChange={(e) => setTipoPagamento('DINHEIRO')} checked={tipoPagamento === 'DINHEIRO'} />
+              Dinheiro
+            </label>
+            : null
+        }
       </div>
       <form onSubmit={handleSubmit(concluirInscricao)} className='mt-4'>
         <div className="flex flex-col sm:flex-row py-2">
