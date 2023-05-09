@@ -83,6 +83,7 @@ export default function TableInscritos({ inscritos, loading, actions }) {
     </div>}
     paginator
     rows={15}
+    rowsPerPageOptions={[5, 15, 30, 50, 100]}
     multiSortMeta={[{ field: 'rede', order: 1 }]}
     sortOrder={1}
     sortMode="multiple"
