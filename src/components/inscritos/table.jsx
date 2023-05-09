@@ -14,12 +14,13 @@ const dataColumns = [
   'Dt. Nascimento',
   'Telefone',
   'Observação',
-  'Responsável por'
+  'Responsável por',
+  'Comprovante/Quem Recebeu'
 ];
 
 export default function TableInscritos({ inscritos, loading, actions }) {
   let initColumnsVisible = dataColumns
-    .filter(c => !["Telefone", "Dt. Nascimento", "Observação"].includes(c));
+    .filter(c => !["Telefone", "Dt. Nascimento", "Observação", "Comprovante/Quem Recebeu"].includes(c));
 
   const redes = useRedesService();
   const [visibleColumns, setVisibleColumns] = useState(initColumnsVisible);
@@ -48,9 +49,25 @@ export default function TableInscritos({ inscritos, loading, actions }) {
     setVisibleColumns(orderedSelectedColumns);
   };
 
+  const comprovanteColumnRender = ({ comprovante }) => {
+    if (comprovante.quemRecebeu) {
+      return comprovante.quemRecebeu;
+    }
+
+    let [, uuid] = comprovante.referencia.split('/')
+    return <a onClick={() => openComprovanteFile(comprovante)} className='cursor-pointer'>{uuid}</a>;
+  }
+
+  const openComprovanteFile = async comprovante => {
+    let request = await fetch(comprovante.arquivo)
+    let file = await request.blob()
+
+    window.open(URL.createObjectURL(file))
+  }
+
   return <DataTable
     value={inscritos}
-    onValueChange={data => setCountRealRows(data.length)}
+    onValueChange={data => setCountRealRows(data?.length || 0)}
     emptyMessage='Nenhuma inscrição realizada'
     loading={loading}
     header={<div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
@@ -74,7 +91,6 @@ export default function TableInscritos({ inscritos, loading, actions }) {
     filters={filters}>
     {visibleColumns.includes('Rede')
       ? <Column
-        key="rede"
         field="rede"
         filter
         filterField="rede"
@@ -85,7 +101,6 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Cargo')
       ? <Column
-        key="cargo"
         field="cargo"
         filter
         filterField="cargo"
@@ -96,7 +111,6 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Nome')
       ? <Column
-        key="nome"
         field="nome"
         filterField="nome"
         filter
@@ -106,7 +120,6 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Sexo')
       ? <Column
-        key="sexo"
         field="sexo"
         filter
         filterField="sexo"
@@ -117,7 +130,6 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Idade')
       ? <Column
-        key="idade"
         field="idade"
         filterField="idade"
         filter
@@ -128,7 +140,6 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Dt. Nascimento')
       ? <Column
-        key="nascimento"
         field="nascimento"
         filterField="nascimento"
         filter
@@ -137,7 +148,6 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Telefone')
       ? <Column
-        key="telefone"
         field="telefone"
         filterField="telefone"
         filter
@@ -146,22 +156,27 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Observação')
       ? <Column
-        key="observacao"
         field="observacao"
         filterField="observacao"
         filter
         filterPlaceholder="Filtrar por Observação"
-        header="Observação" 
+        header="Observação"
         sortable />
       : null}
     {visibleColumns.includes('Responsável por')
       ? <Column
-        key="criancas"
         field="criancas"
         filterField="criancas"
         filter
         filterPlaceholder="Filtrar por Responsável por"
         header="Responsável por" />
+      : null}
+    {visibleColumns.includes('Comprovante/Quem Recebeu')
+      ? <Column
+        field="comprovante.referencia"
+        header="Comprovante/Quem Recebeu"
+        sortable
+        body={comprovanteColumnRender} />
       : null}
     {
       actions
