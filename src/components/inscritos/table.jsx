@@ -15,12 +15,13 @@ const dataColumns = [
   'Telefone',
   'Observação',
   'Responsável por',
-  'Comprovante/Quem Recebeu'
+  'Comprovante/Quem Recebeu',
+  'Equipe'
 ];
 
 export default function TableInscritos({ inscritos, loading, actions }) {
   let initColumnsVisible = dataColumns
-    .filter(c => !["Telefone", "Dt. Nascimento", "Observação", "Comprovante/Quem Recebeu"].includes(c));
+    .filter(c => !["Telefone", "Dt. Nascimento", "Observação", "Comprovante/Quem Recebeu", "Equipe"].includes(c));
 
   const redes = useRedesService();
   const [visibleColumns, setVisibleColumns] = useState(initColumnsVisible);
@@ -34,7 +35,8 @@ export default function TableInscritos({ inscritos, loading, actions }) {
     nascimento: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
     idade: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
     observacao: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-    criancas: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] }
+    criancas: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
+    equipe: { value: null, matchMode: FilterMatchMode.IN },
   });
 
   useEffect(() => {
@@ -178,6 +180,16 @@ export default function TableInscritos({ inscritos, loading, actions }) {
         header="Comprovante/Quem Recebeu"
         sortable
         body={comprovanteColumnRender} />
+      : null}
+    {visibleColumns.includes('Equipe')
+      ? <Column
+      field="equipe"
+      filter
+      filterField="equipe"
+      filterElement={options => <MultiSelect filter value={options.value} options={['Amarelo', 'Verde']} onChange={(e) => options.filterCallback(e.value)} placeholder="Filtrar por Equipe" className="p-column-filter" />}
+      showFilterMatchModes={false}
+      header="Equipe"
+      sortable />
       : null}
     {
       actions
