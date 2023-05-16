@@ -3,6 +3,7 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { MultiSelect } from 'primereact/multiselect';
 import { useEffect, useState } from 'react';
+import { useMultipleSort } from '../../hooks/useMultipleSort';
 import { useRedesService } from '../../services/useRedesService';
 
 const dataColumns = [
@@ -24,6 +25,7 @@ export default function TableInscritos({ inscritos, loading, actions }) {
     .filter(c => !["Telefone", "Dt. Nascimento", "Observação", "Comprovante/Quem Recebeu", "Equipe"].includes(c));
 
   const redes = useRedesService();
+  const multipleSort = useMultipleSort();
   const [visibleColumns, setVisibleColumns] = useState(initColumnsVisible);
   const [countRealRows, setCountRealRows] = useState(0);
   const [filters, setFilter] = useState({
@@ -67,8 +69,17 @@ export default function TableInscritos({ inscritos, loading, actions }) {
     window.open(URL.createObjectURL(file))
   }
 
+  let inscritosSorted = multipleSort(
+    inscritos
+      .map(inscrito => ({
+        ...inscrito,
+        _defaultSort: `${inscrito.criancas || inscrito.nome} ${inscrito.cargo}`
+      })),
+    { '_defaultSort': 'asc' }
+  );
+
   return <DataTable
-    value={inscritos}
+    value={inscritosSorted}
     onValueChange={data => setCountRealRows(data?.length || 0)}
     emptyMessage='Nenhuma inscrição realizada'
     loading={loading}
@@ -183,13 +194,13 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Equipe')
       ? <Column
-      field="equipe"
-      filter
-      filterField="equipe"
-      filterElement={options => <MultiSelect filter value={options.value} options={['Amarelo', 'Verde']} onChange={(e) => options.filterCallback(e.value)} placeholder="Filtrar por Equipe" className="p-column-filter" />}
-      showFilterMatchModes={false}
-      header="Equipe"
-      sortable />
+        field="equipe"
+        filter
+        filterField="equipe"
+        filterElement={options => <MultiSelect filter value={options.value} options={['Amarelo', 'Verde']} onChange={(e) => options.filterCallback(e.value)} placeholder="Filtrar por Equipe" className="p-column-filter" />}
+        showFilterMatchModes={false}
+        header="Equipe"
+        sortable />
       : null}
     {
       actions
