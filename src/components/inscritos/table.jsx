@@ -1,6 +1,7 @@
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
+import { InputText } from 'primereact/inputtext';
 import { MultiSelect } from 'primereact/multiselect';
 import { useEffect, useState } from 'react';
 import { useMultipleSort } from '../../hooks/useMultipleSort';
@@ -20,15 +21,14 @@ const dataColumns = [
   'Equipe'
 ];
 
-export default function TableInscritos({ inscritos, loading, actions }) {
-  let initColumnsVisible = dataColumns
-    .filter(c => !["Telefone", "Dt. Nascimento", "Observação", "Comprovante/Quem Recebeu", "Equipe"].includes(c));
-
+export default function TableInscritos({ inscritos, loading, columnsExtras, columnsDefault }) {
   const redes = useRedesService();
   const multipleSort = useMultipleSort();
-  const [visibleColumns, setVisibleColumns] = useState(initColumnsVisible);
+  const [visibleColumns, setVisibleColumns] = useState(columnsDefault ? columnsDefault : ["Rede", "Cargo", "Nome", "Sexo", "Idade", "Responsável por"]);
   const [countRealRows, setCountRealRows] = useState(0);
-  const [filters, setFilter] = useState({
+  const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [filters, setFilters] = useState({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     rede: { value: null, matchMode: FilterMatchMode.IN },
     cargo: { value: null, matchMode: FilterMatchMode.IN },
     nome: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
@@ -44,13 +44,15 @@ export default function TableInscritos({ inscritos, loading, actions }) {
   useEffect(() => {
     setCountRealRows(inscritos.length)
   }, [inscritos])
+  
+  const onGlobalFilterChange = (e) => {
+    const value = e.target.value;
+    let _filters = { ...filters };
 
-  const onColumnToggle = (event) => {
-    let selectedColumns = event.value;
-    let orderedSelectedColumns = dataColumns.filter((col) =>
-      selectedColumns.some((sCol) => sCol === col));
+    _filters['global'].value = value;
 
-    setVisibleColumns(orderedSelectedColumns);
+    setFilters(_filters);
+    setGlobalFilterValue(value);
   };
 
   const comprovanteColumnRender = ({ comprovante }) => {
@@ -84,13 +86,19 @@ export default function TableInscritos({ inscritos, loading, actions }) {
     emptyMessage='Nenhuma inscrição realizada'
     loading={loading}
     header={<div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+      <div className="flex justify-content-end">
+        <span className="p-input-icon-left">
+          <i className="pi pi-search" />
+          <InputText type='search' value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Pesquisar por..." />
+        </span>
+      </div>
       <span>Total de registros: {countRealRows} {countRealRows === 1 ? "inscrito" : "inscritos"}</span>
       <MultiSelect
         value={visibleColumns}
         options={dataColumns}
         placeholder="Colunas visíveis"
         className="w-full max-w-xs"
-        onChange={onColumnToggle}
+        onChange={event => setVisibleColumns(event.value)}
         maxSelectedLabels={3}
         display="chip" />
     </div>}
@@ -105,6 +113,7 @@ export default function TableInscritos({ inscritos, loading, actions }) {
     filters={filters}>
     {visibleColumns.includes('Rede')
       ? <Column
+        key="rede"
         field="rede"
         filter
         filterField="rede"
@@ -115,6 +124,7 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Cargo')
       ? <Column
+        key="cargo"
         field="cargo"
         filter
         filterField="cargo"
@@ -125,6 +135,7 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Nome')
       ? <Column
+        key="nome"
         field="nome"
         filterField="nome"
         filter
@@ -134,6 +145,7 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Sexo')
       ? <Column
+        key="sexo"
         field="sexo"
         filter
         filterField="sexo"
@@ -144,6 +156,7 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Idade')
       ? <Column
+        key="idade"
         field="idade"
         filterField="idade"
         filter
@@ -154,6 +167,7 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Dt. Nascimento')
       ? <Column
+        key="nascimento"
         field="nascimento"
         filterField="nascimento"
         filter
@@ -162,6 +176,7 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Telefone')
       ? <Column
+        key="telefone"
         field="telefone"
         filterField="telefone"
         filter
@@ -170,6 +185,7 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Observação')
       ? <Column
+        key="observacao"
         field="observacao"
         filterField="observacao"
         filter
@@ -179,6 +195,7 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Responsável por')
       ? <Column
+        key="criancas"
         field="criancas"
         filterField="criancas"
         filter
@@ -187,6 +204,7 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Comprovante/Quem Recebeu')
       ? <Column
+        key="comprovante.referencia"
         field="comprovante.referencia"
         header="Comprovante/Quem Recebeu"
         sortable
@@ -194,6 +212,7 @@ export default function TableInscritos({ inscritos, loading, actions }) {
       : null}
     {visibleColumns.includes('Equipe')
       ? <Column
+        key="equipe"
         field="equipe"
         filter
         filterField="equipe"
@@ -203,10 +222,8 @@ export default function TableInscritos({ inscritos, loading, actions }) {
         sortable />
       : null}
     {
-      actions
-        ? <Column
-          header="#"
-          body={actions} />
+      columnsExtras
+        ? columnsExtras
         : null
     }
   </DataTable>

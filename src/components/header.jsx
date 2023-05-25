@@ -1,14 +1,23 @@
 import { useRouter } from 'next/router';
 import { classNames } from 'primereact/utils';
+import { useEffect } from 'react';
+import { useConfigService } from "../services/useConfigService";
 
 const navigation = [
   { title: "Inicio", to: "" },
   { title: "Inscritos", to: "inscritos" },
-  // { title: "Vendinha", to: "vendinha" },
 ]
 
 export const HeaderNavigation = ({ current }) => {
   const { asPath } = useRouter();
+  const { permitirVendinha } = useConfigService();
+
+  useEffect(() => {
+    if (permitirVendinha === true) {
+      navigation.push({ title: "Vendinha", to: "vendinha" });
+    }
+  }, [permitirVendinha]);
+
   const [firstPage, ..._] = asPath.slice(1)
     .split('/');
 

@@ -1,4 +1,5 @@
 
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { NovoModalInscrito } from '../../components/inscritos/modal/adicionar';
 import { FinalizarModalInscrito } from '../../components/inscritos/modal/finalizar';
@@ -10,10 +11,12 @@ const deparaCargo = {
   'SERVO': "Servo",
   'CRIANCA': "Criança",
   'RESPONSAVEL': "Responsável",
+  'CONVIDADO': "Convidado",
 }
 
-export default function Index() {
+export default function Novo() {
   const { parse } = useInscrito();
+  const { query } = useRouter();
   const [inscritosAdded, setInscritosAdded] = useState([]);
 
   const adicionarInscrito = (data, tipoInscricao) => {
@@ -45,7 +48,7 @@ export default function Index() {
     title="Adicione os inscritos que você quer cadastrar"
     actions={<div className="flex self-end gap-4">
       <a
-        href="/inscritos"
+        href={query.redirectUrl ? query.redirectUrl : "/inscritos"}
         className="text-white px-3 py-2 rounded-md text-sm">
         Cancelar
       </a>

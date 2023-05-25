@@ -11,12 +11,14 @@ import { SelectButton } from 'primereact/selectbutton';
 import { classNames } from "primereact/utils";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useConfigService } from '../../../services/useConfigService';
 import { useInscritosService } from '../../../services/useInscritosService';
 import { useRedesService } from "../../../services/useRedesService";
 
 export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
   const redes = useRedesService();
   const { inscritos, loading } = useInscritosService();
+  const { permitirInscricao } = useConfigService();
 
   const [visible, setVisible] = useState(false);
   const [tipoInscricao, setTipoInscricao] = useState(null);
@@ -38,7 +40,7 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
     .concat(inscritosAdded)
     .concat(inscritos)
     .filter(i => i.cargo === 'Criança');
-    
+
   criancasSaved.sort((a, b) => a.nome.localeCompare(b.nome))
 
   return <>
@@ -55,34 +57,45 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
       onHide={hideModal}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-col sm:flex-row gap-6">
-          <label htmlFor="servoTipoId" className={classNames(
-            tipoInscricao === 'SERVO' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
-            "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
-          )}>
-            <RadioButton inputId="servoTipoId" value="SERVO" onChange={(e) => setTipoInscricao('SERVO')} checked={tipoInscricao === 'SERVO'} />
-            Servo
-          </label>
-          <label htmlFor="criancaTipoId" className={classNames(
-            tipoInscricao === 'CRIANCA' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
-            "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
-          )}>
-            <RadioButton inputId="criancaTipoId" value="CRIANCA" onChange={(e) => setTipoInscricao('CRIANCA')} checked={tipoInscricao === 'CRIANCA'} />
-            Criança
-          </label>
-          <label htmlFor="responsavelTipoId" className={classNames(
-            tipoInscricao === 'RESPONSAVEL' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
-            "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
-          )}>
-            <RadioButton inputId="responsavelTipoId" value="RESPONSAVEL" onChange={(e) => setTipoInscricao('RESPONSAVEL')} checked={tipoInscricao === 'RESPONSAVEL'} />
-            Responsável
-          </label>
+          {
+            permitirInscricao === true
+              ? <>
+                <label htmlFor="servoTipoId" className={classNames(
+                  tipoInscricao === 'SERVO' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
+                  "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
+                )}>
+                  <RadioButton inputId="servoTipoId" value="SERVO" onChange={(e) => setTipoInscricao('SERVO')} checked={tipoInscricao === 'SERVO'} />
+                  Servo
+                </label>
+                <label htmlFor="criancaTipoId" className={classNames(
+                  tipoInscricao === 'CRIANCA' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
+                  "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
+                )}>
+                  <RadioButton inputId="criancaTipoId" value="CRIANCA" onChange={(e) => setTipoInscricao('CRIANCA')} checked={tipoInscricao === 'CRIANCA'} />
+                  Criança
+                </label>
+                <label htmlFor="responsavelTipoId" className={classNames(
+                  tipoInscricao === 'RESPONSAVEL' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
+                  "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
+                )}>
+                  <RadioButton inputId="responsavelTipoId" value="RESPONSAVEL" onChange={(e) => setTipoInscricao('RESPONSAVEL')} checked={tipoInscricao === 'RESPONSAVEL'} />
+                  Responsável
+                </label>
+              </>
+              : <label htmlFor="convidadoId" className={classNames(
+                tipoInscricao === 'CONVIDADO' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
+                "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
+              )}>
+                <RadioButton inputId="convidadoId" value="CONVIDADO" onChange={(e) => setTipoInscricao('CONVIDADO')} checked={tipoInscricao === 'CONVIDADO'} />
+                Convidado
+              </label>
+          }
         </div>
 
-        
         {
           tipoInscricao === 'RESPONSAVEL'
-          ? <Message className='w-full mt-8' severity="info" text="Primeiro realize o cadastro das suas crianças" /> 
-          : null 
+            ? <Message className='w-full mt-8' severity="info" text="Primeiro realize o cadastro das suas crianças" />
+            : null
         }
 
         {tipoInscricao !== null
@@ -130,7 +143,7 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
                 : null
             }
             {
-              ['RESPONSAVEL', 'SERVO'].includes(tipoInscricao)
+              ['RESPONSAVEL', 'SERVO', 'CONVIDADO'].includes(tipoInscricao)
                 ?
                 <div className="flex flex-col sm:flex-row py-2">
                   <label className="text-base w-52">Telefone *</label>

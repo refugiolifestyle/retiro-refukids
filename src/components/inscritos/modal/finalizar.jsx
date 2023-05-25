@@ -15,7 +15,8 @@ import { useConfigService } from '../../../services/useConfigService';
 const deparaValores = {
   "Servo": 110,
   "Criança": 125,
-  "Responsável": 145
+  "Responsável": 145,
+  "Convidado": 0
 }
 
 export const FinalizarModalInscrito = ({ inscritos }) => {
@@ -24,7 +25,8 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tipoPagamento, setTipoPagamento] = useState(null);
-  const { permitirDinheiro } = useConfigService();
+  const { query } = useRouter();
+  const { permitirDinheiro, permitirInscricao } = useConfigService();
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   useEffect(() => {
@@ -44,7 +46,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
       setLoading(false);
       hideModal();
 
-      router.replace('/inscritos');
+      router.replace(query.redirectUrl ? query.redirectUrl : "/inscritos");
     }, 3000);
   }
 
@@ -75,7 +77,12 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
   const concluirInscricao = async data => {
     setLoading(true);
 
-    if (tipoPagamento === 'PIX') {
+    if (tipoPagamento === 'CONVIDADO') {
+      await salvarInscritos(null);
+      
+      confirmacaoPagamento();
+    }
+    else if (tipoPagamento === 'PIX') {
       let reader = new FileReader();
       reader.onload = async ({ target }) => {
         let comprovantePath = await salvarComprovante({
@@ -123,23 +130,35 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
       style={{ width: '50vw' }}
       onHide={hideModal}>
       <div className="flex flex-col sm:flex-row gap-6">
-        <label htmlFor="PIXTipoId" className={classNames(
-          tipoPagamento === 'PIX' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
-          "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
-        )}>
-          <RadioButton inputId="PIXTipoId" value="PIX" onChange={(e) => setTipoPagamento('PIX')} checked={tipoPagamento === 'PIX'} />
-          PIX
-        </label>
         {
-          permitirDinheiro === true
-            ? <label htmlFor="DinheiroTipoId" className={classNames(
-              tipoPagamento === 'DINHEIRO' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
+          permitirInscricao === true
+            ? <>
+              <label htmlFor="PIXTipoId" className={classNames(
+                tipoPagamento === 'PIX' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
+                "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
+              )}>
+                <RadioButton inputId="PIXTipoId" value="PIX" onChange={(e) => setTipoPagamento('PIX')} checked={tipoPagamento === 'PIX'} />
+                PIX
+              </label>
+              {
+                permitirDinheiro === true
+                  ? <label htmlFor="DinheiroTipoId" className={classNames(
+                    tipoPagamento === 'DINHEIRO' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
+                    "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
+                  )}>
+                    <RadioButton inputId="DinheiroTipoId" value="DINHEIRO" onChange={(e) => setTipoPagamento('DINHEIRO')} checked={tipoPagamento === 'DINHEIRO'} />
+                    Dinheiro
+                  </label>
+                  : null
+              }
+            </>
+            : <label htmlFor="ConvidadoTipoId" className={classNames(
+              tipoPagamento === 'CONVIDADO' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
               "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
             )}>
-              <RadioButton inputId="DinheiroTipoId" value="DINHEIRO" onChange={(e) => setTipoPagamento('DINHEIRO')} checked={tipoPagamento === 'DINHEIRO'} />
-              Dinheiro
+              <RadioButton inputId="ConvidadoTipoId" value="CONVIDADO" onChange={(e) => setTipoPagamento('CONVIDADO')} checked={tipoPagamento === 'CONVIDADO'} />
+              CONVIDADO
             </label>
-            : null
         }
       </div>
       <form onSubmit={handleSubmit(concluirInscricao)} className='mt-4'>
