@@ -17,7 +17,6 @@ const dataColumns = [
   'Telefone',
   'Observação',
   'Responsável por',
-  'Comprovante/Quem Recebeu',
   'Equipe'
 ];
 
@@ -54,22 +53,6 @@ export default function TableInscritos({ inscritos, loading, columnsExtras, colu
     setFilters(_filters);
     setGlobalFilterValue(value);
   };
-
-  const comprovanteColumnRender = ({ comprovante }) => {
-    if (comprovante.quemRecebeu) {
-      return comprovante.quemRecebeu;
-    }
-
-    let [, uuid] = comprovante.referencia.split('/')
-    return <a onClick={() => openComprovanteFile(comprovante)} className='cursor-pointer'>{uuid}</a>;
-  }
-
-  const openComprovanteFile = async comprovante => {
-    let request = await fetch(comprovante.arquivo)
-    let file = await request.blob()
-
-    window.open(URL.createObjectURL(file))
-  }
 
   let inscritosSorted = multipleSort(
     inscritos
@@ -201,14 +184,6 @@ export default function TableInscritos({ inscritos, loading, columnsExtras, colu
         filter
         filterPlaceholder="Filtrar por Responsável por"
         header="Responsável por" />
-      : null}
-    {visibleColumns.includes('Comprovante/Quem Recebeu')
-      ? <Column
-        key="comprovante.referencia"
-        field="comprovante.referencia"
-        header="Comprovante/Quem Recebeu"
-        sortable
-        body={comprovanteColumnRender} />
       : null}
     {visibleColumns.includes('Equipe')
       ? <Column
