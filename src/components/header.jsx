@@ -13,7 +13,7 @@ export const HeaderNavigation = ({ current }) => {
   const { permitirVendinha } = useConfigService();
 
   useEffect(() => {
-    if (permitirVendinha === true) {
+    if (permitirVendinha === true && !navigation.some(n => n.to === 'vendinha')) {
       navigation.push({ title: "Vendinha", to: "vendinha" });
     }
   }, [permitirVendinha]);

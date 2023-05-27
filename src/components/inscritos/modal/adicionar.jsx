@@ -148,7 +148,7 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
                 <div className="flex flex-col sm:flex-row py-2">
                   <label className="text-base w-52">Telefone *</label>
                   <div className="flex flex-1 flex-col">
-                    <InputMask {...register(`telefone`, { required: ['RESPONSAVEL', 'SERVO'].includes(tipoInscricao) })} mask="(99) 99999-9999" />
+                    <InputMask {...register(`telefone`, { required: ['RESPONSAVEL', 'SERVO', 'CONVIDADO'].includes(tipoInscricao) })} mask="(99) 99999-9999" />
                     {errors.telefone && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
                   </div>
                 </div>
