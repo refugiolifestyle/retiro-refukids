@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from 'react-hook-form';
 import { v4 } from 'uuid';
 import { firebaseDatabase } from '../../../configs/firebase';
+import { useInscrito } from '../../../hooks/useInscrito';
 import { useConfigService } from '../../../services/useConfigService';
 
 const deparaValores = {
@@ -28,6 +29,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
   const { query } = useRouter();
   const { permitirDinheiro, permitirInscricao } = useConfigService();
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { parse } = useInscrito();
 
   useEffect(() => {
     setTipoPagamento(null);
@@ -68,7 +70,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
     for (let inscrito of inscritos) {
       let inscritoRef = ref(firebaseDatabase, `inscritos/${inscrito.rede}/${inscrito.nome}`);
       await set(inscritoRef, {
-        ...inscrito,
+        ...parse(inscrito),
         comprovante
       });
     }
