@@ -93,7 +93,8 @@
 
         setTimeout(() => {
             html2canvas(document.querySelector("#flyer"), {
-                dpi: 300
+                dpi: 300,
+                scale: 1
             })
                 .then(canvas => {
                     canvas.toBlob(blob => document.write(`<img src='${URL.createObjectURL(blob)}' alt='Rifa ${identificador}' />`))
