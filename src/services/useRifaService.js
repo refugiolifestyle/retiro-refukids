@@ -27,13 +27,13 @@ export const useRifaService = () => {
     })
   }, []);
 
-  const registrarVenda = useCallback(async (inscrito, numero) => {
+  const registrarVenda = useCallback(async (inscrito, numero, comprador) => {
     setLoading(true);
 
     let rifaPath = `rifas/${inscrito.nome} - ${inscrito.rede}/${numero}`;
     let rifaRef = ref(firebaseDatabase, rifaPath);
 
-    await set(rifaRef, true);
+    await set(rifaRef, comprador);
 
     setLoading(false);
   }, []);

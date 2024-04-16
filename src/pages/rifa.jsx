@@ -14,7 +14,7 @@ export default function Rifa() {
 
   const buildRifaNumerosColumns = (inscrito) => {
     let totalVendido = Object.values(inscrito.numeros)
-      .filter(numero => numero)
+      .filter(comprador => !!comprador)
       .length
 
     return <div key={`action-${inscrito.rede}-${inscrito.nome}`}

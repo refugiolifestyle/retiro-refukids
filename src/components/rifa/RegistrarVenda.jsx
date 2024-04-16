@@ -1,6 +1,6 @@
 import { Button } from 'primereact/button';
 import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
+import { Avatar } from "primereact/avatar";
 import { Dialog } from 'primereact/dialog';
 import { Fragment, useEffect, useState } from 'react';
 import { useFieldArray, useForm } from "react-hook-form";
@@ -12,9 +12,9 @@ export const RegistrarVenda = ({ inscrito }) => {
     const { registrarVenda, loading } = useRifaService();
 
     const onNumeroClick = (inscrito, numero) => {
-        let confirm = window.confirm(`Deseja registrar a venda do número ${numero}?`);
-        if (confirm) {
-            registrarVenda(inscrito, numero)
+        let comprador = window.prompt(`Para quem foi vendido o número ${numero}?`);
+        if (comprador) {
+            registrarVenda(inscrito, numero, comprador)
         }
     }
 
@@ -32,11 +32,13 @@ export const RegistrarVenda = ({ inscrito }) => {
             <div style={{ width: '560px' }}>
                 {
                     Object.entries(inscrito.numeros)
-                        .map(([numero, vendido]) => <Button
+                        .map(([numero, comprador]) => <Button
                             key={numero}
                             label={numero}
-                            disabled={vendido}
                             loading={loading}
+                            disabled={!!comprador}
+                            tooltip={comprador}
+                            tooltipOptions={{ position: "bottom", showOnDisabled: true }}
                             className="p-button-outlined p-button-rounded w-12 h-12 p-1 m-1"
                             onClick={() => onNumeroClick(inscrito, numero)} />)
                 }
