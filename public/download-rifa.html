@@ -91,16 +91,18 @@
                 tabela.innerHTML = tabela.innerHTML + `<span class="${vendido ? 'vendido' : ''}">${numero}</span>`
             })
 
-        html2canvas(document.querySelector("#flyer"), {
-            scale: 2,
-            dpi: 300
-        })
-            .then(canvas => {
-                link.href = canvas.toDataURL("image/png")
-                link.download = identificador
-                link.innerText = identificador
-                link.click()
-            });
+        setTimeout(() => {
+            html2canvas(document.querySelector("#flyer"), {
+                scale: 2,
+                dpi: 300
+            })
+                .then(canvas => {
+                    link.href = canvas.toDataURL("image/png")
+                    link.download = identificador
+                    link.innerText = identificador
+                    link.click()
+                });
+        }, 2000)
     </script>
 </body>
 
