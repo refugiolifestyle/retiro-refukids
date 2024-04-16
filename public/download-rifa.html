@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rifa</title>
+    <style>
+        #flyer {
+            width: 1200px;
+            height: 2400px;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-weight: bold;
+            font-size: 30px;
+        }
+
+        #flyer #nome {
+            position: absolute;
+            color: #000;
+            top: 2210px;
+            left: 30px;
+            width: 1155px;
+            height: 155px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 56px;
+            font-family: Roboto;
+        }
+
+        #flyer #tabela {
+            position: absolute;
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            top: 1010px;
+            left: 65px;
+            width: 1100px;
+            height: 700px;
+        }
+
+        #flyer #tabela span {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            -webkit-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+            -moz-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+            box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+            border-radius: 50%;
+            height: 100px;
+            width: 100px;
+            font-size: 36px;
+            font-family: Roboto;
+        }
+
+        #flyer #tabela span.vendido {
+            background-color: #faaeae;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+        rel="stylesheet">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+
+<body>
+    <div id="flyer">
+        <img id="bg" src="rifa.jpg" alt="">
+        <span id="nome">
+        </span>
+        <div id="tabela">
+        </div>
+    </div>
+    <a id="link"></a>
+    <script>
+        let link = document.getElementById("link")
+        let nome = document.getElementById("nome")
+        let tabela = document.getElementById("tabela")
+
+        let urlParams = new URLSearchParams(window.location.search);
+        let identificador = urlParams.get('nome')
+        let numeros = JSON.parse(urlParams.get('numeros'))
+
+        nome.innerText = identificador
+
+        Object.entries(numeros)
+            .forEach(([numero, vendido]) => {
+                tabela.innerHTML = tabela.innerHTML + `<span class="${vendido ? 'vendido' : ''}">${numero}</span>`
+            })
+
+        html2canvas(document.querySelector("#flyer"), {
+            scale: 2,
+            dpi: 300
+        })
+            .then(canvas => {
+                link.href = canvas.toDataURL("image/png")
+                link.download = identificador
+                link.innerText = identificador
+                link.click()
+                window.close()
+            });
+    </script>
+</body>
+
+</html>

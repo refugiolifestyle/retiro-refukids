@@ -12,6 +12,8 @@ const parse = (inscrito) => {
 
     inscrito.nascimento = dtNascimento
     inscrito.idade = formatAge(dtNascimento)
+  } else {
+    delete inscrito.nascimento
   }
 
   if (inscrito.criancas) {
@@ -24,7 +26,6 @@ const parse = (inscrito) => {
       .map(nome => formatNome(nome))
       .join(', ')
   }
-
 
   inscrito.nome = formatNome(inscrito.nome)
   return inscrito

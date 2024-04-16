@@ -67,7 +67,7 @@ export const NovaCompraVendinhaModal = ({ inscrito, produtos }) => {
                 style: 'currency',
                 currency: 'BRL'
             }).format(totalGeral)}</h2>}
-            footer={<div className="flex justify-end items-center">
+            footer={<div className="flex justify-end items-center pt-5">
                 <Button
                     disabled={totalGeral == 0}
                     loading={loading}

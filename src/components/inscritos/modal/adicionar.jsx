@@ -14,9 +14,11 @@ import { useForm } from "react-hook-form";
 import { useConfigService } from '../../../services/useConfigService';
 import { useInscritosService } from '../../../services/useInscritosService';
 import { useRedesService } from "../../../services/useRedesService";
+import { useEquipesService } from "../../../services/useEquipesService";
 
 export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
   const redes = useRedesService();
+  const equipes = useEquipesService();
   const { inscritos, loading } = useInscritosService();
   const { permitirInscricao } = useConfigService();
 
@@ -25,7 +27,31 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
   const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
 
   const onSubmit = data => {
+    switch (tipoInscricao) {
+      case "SERVO":
+        delete data.nascimento
+        delete data.observacao
+        delete data.criancas
+        break;
+      case "CRIANCA":
+        delete data.telefone
+        delete data.criancas
+        delete data.equipe
+        break;
+      case "RESPONSAVEL":
+        delete data.nascimento
+        delete data.observacao
+        delete data.equipe
+        break;
+      default:
+        delete data.nascimento
+        delete data.observacao
+        delete data.equipe
+        delete data.criancas
+        break;
+    }
     adicionarInscrito(data, tipoInscricao);
+
     hideModal();
   };
 
@@ -171,6 +197,20 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
                         placeholder={loading ? "Carregando..." : "Selecione suas crianças"}
                         className="flex-1" />
                       {errors.criancas && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
+                    </div>
+                  </div>
+                </>
+                : null
+            }
+
+            {
+              tipoInscricao === 'SERVO'
+                ? <>
+                  <div className="flex flex-col sm:flex-row py-2">
+                    <label className="text-base w-52">Equipe *</label>
+                    <div className="flex flex-1 flex-col">
+                      <Dropdown value={watch('equipe')} {...register('equipe', { required: true })} options={equipes} />
+                      {errors.equipe && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
                     </div>
                   </div>
                 </>

@@ -99,7 +99,6 @@ export const ComprasVendinhaModal = ({ inscrito }) => {
                         <Badge
                             value={pago ? "Pago" : "Falta pagar"}
                             severity={pago ? "success" : "warning"}
-                            size="large"
                         ></Badge>
                     }></Column>
                 <Column

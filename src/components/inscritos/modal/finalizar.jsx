@@ -9,14 +9,15 @@ import { classNames } from 'primereact/utils';
 import { useEffect, useRef, useState } from "react";
 import { useForm } from 'react-hook-form';
 import { v4 } from 'uuid';
-import { firebaseDatabase } from '../../../configs/firebase';
+import { firebaseDatabase, firebaseStorage } from '../../../configs/firebase';
 import { useInscrito } from '../../../hooks/useInscrito';
 import { useConfigService } from '../../../services/useConfigService';
+import { uploadString, ref as storageRef } from 'firebase/storage';
 
 const deparaValores = {
-  "Servo": 110,
-  "Criança": 125,
-  "Responsável": 145,
+  "Servo": 240,
+  "Criança": 120,
+  "Responsável": 240,
   "Convidado": 0
 }
 
@@ -41,22 +42,12 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
     reset();
   }
 
-  const confirmacaoPagamento = () => {
-    toast.current.show({ severity: 'success', summary: 'Sucesso', detail: 'Cadastro finalizado com sucesso' });
-
-    setTimeout(() => {
-      setLoading(false);
-      hideModal();
-
-      router.replace(query.redirectUrl ? query.redirectUrl : "/inscritos");
-    }, 3000);
-  }
-
-  const salvarComprovante = async (pagamento) => {
-    let uuid = v4();
-    let comprovantePath = `comprovante/${uuid}`;
+  const salvarComprovante = async (uuid, pagamento) => {
+    let comprovantePath = `comprovantes/${uuid}`;
     let comprovanteRef = ref(firebaseDatabase, comprovantePath);
+
     await set(comprovanteRef, {
+      tipoPagamento,
       inscritos: inscritos.map(({ rede, cargo, nome }) => ({ rede, cargo, nome })),
       valor: getAmount(),
       data: new Date().toLocaleString("pt-BR"),
@@ -69,6 +60,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
   const salvarInscritos = async (comprovante) => {
     for (let inscrito of inscritos) {
       let inscritoRef = ref(firebaseDatabase, `inscritos/${inscrito.rede}/${inscrito.nome}`);
+      
       await set(inscritoRef, {
         ...parse(inscrito),
         comprovante
@@ -76,41 +68,63 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
     }
   }
 
+  const finalizarInscricao = async () => {
+    toast.current.show({ severity: 'success', summary: 'Sucesso', detail: 'Cadastro finalizado com sucesso' });
+
+    setTimeout(() => {
+      setLoading(false);
+      hideModal();
+
+      router.replace(query.redirectUrl ? query.redirectUrl : "/inscritos");
+    }, 3000);
+  }
+
   const concluirInscricao = async data => {
     setLoading(true);
 
     if (tipoPagamento === 'CONVIDADO') {
       await salvarInscritos(null);
-      
-      confirmacaoPagamento();
-    }
-    else if (tipoPagamento === 'PIX') {
+
+      await finalizarInscricao();
+    } else if (tipoPagamento === 'PIX') {
+      let file = data.comprovante.item(0)
+
       let reader = new FileReader();
       reader.onload = async ({ target }) => {
-        let comprovantePath = await salvarComprovante({
-          comprovante: target.result
-        });
+        let uuid = v4();
+        let extension = file.name.split('.').pop()
+        let filePath = `comprovantes/${uuid}.${extension}`
+        const comprovanteStorageRef = storageRef(firebaseStorage, filePath);
+        await uploadString(comprovanteStorageRef, target.result, 'data_url')
+
+        await salvarComprovante(uuid, {
+          arquivo: filePath,
+        })
 
         await salvarInscritos({
-          referencia: comprovantePath,
-          arquivo: target.result
+          referencia: uuid,
+          arquivo: filePath,
+          tipoPagamento
         });
 
-        confirmacaoPagamento();
+        await finalizarInscricao();
       }
 
-      reader.readAsDataURL(data.comprovante.item(0));
-    } else {
-      let comprovantePath = await salvarComprovante({
+      reader.readAsDataURL(file);
+    } else if (tipoPagamento === 'DINHEIRO') {
+      let uuid = v4();
+      
+      await salvarComprovante(uuid, {
         quemRecebeu: data.quemRecebeu
-      });
+      })
 
       await salvarInscritos({
-        referencia: comprovantePath,
-        quemRecebeu: data.quemRecebeu
+        referencia: uuid,
+        quemRecebeu: data.quemRecebeu,
+        tipoPagamento
       });
 
-      confirmacaoPagamento();
+      await finalizarInscricao();
     }
   }
 
