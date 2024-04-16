@@ -19,8 +19,6 @@ export const RegistrarVenda = ({ inscrito }) => {
     return <Fragment key={`action-registar-venda-${inscrito.rede}-${inscrito.nome}`}>
         <Button
             icon="pi pi-plus"
-            tooltip="Registrar venda"
-            tooltipOptions={{ position: "bottom" }}
             className="p-button-outlined p-button-rounded p-button-link p-3"
             onClick={() => setVisible(true)} />
         <Dialog

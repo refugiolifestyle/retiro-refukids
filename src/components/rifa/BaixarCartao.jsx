@@ -1,29 +1,26 @@
 import { Button } from 'primereact/button';
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { Dialog } from 'primereact/dialog';
+import { Tooltip } from 'primereact/tooltip';
 import { Fragment, useEffect, useState } from 'react';
 import { useFieldArray, useForm } from "react-hook-form";
 import { useVendinhaService } from "../../services/useVendinhaService";
 import { useRifaService } from '../../services/useRifaService';
 
 export const BaixarCartao = ({ inscrito }) => {
+    let keyIdentifier = `action-baixar-cartao-${inscrito.rede.replaceAll(' ', '_')}-${inscrito.nome.replaceAll(' ', '_')}`
 
-    const onBaixarClick = () => {
-        let params = new URLSearchParams({
-            nome: `${inscrito.nome} - ${inscrito.rede}`,
-            numeros: JSON.stringify(inscrito.numeros)
-        })
-        
-        window.open(`download-rifa.html?${params.toString()}`, '_blank')
-    }
+    let params = new URLSearchParams({
+        nome: `${inscrito.nome} - ${inscrito.rede}`,
+        numeros: JSON.stringify(inscrito.numeros)
+    })
 
-    return <Fragment key={`action-baixar-cartao-${inscrito.rede}-${inscrito.nome}`}>
-        <Button
-            icon="pi pi-download"
-            tooltip="Baixar cartão (atualizado)"
-            tooltipOptions={{ position: "bottom" }}
-            className="p-button-outlined p-button-rounded p-button-link p-3"
-            onClick={() => onBaixarClick()} />
+    return <Fragment key={keyIdentifier}>
+        <a
+            href={`download-rifa.html?${params.toString()}`}
+            target='_blank'
+            className={`p-3`}>
+            <i className='pi pi-download' />
+        </a>
     </Fragment>;
 }
