@@ -6,6 +6,9 @@ import { MultiSelect } from 'primereact/multiselect';
 import { useEffect, useState } from 'react';
 import { useMultipleSort } from '../../hooks/useMultipleSort';
 import { useRedesService } from '../../services/useRedesService';
+import { getDownloadURL, ref } from 'firebase/storage';
+import { firebaseStorage } from '../../configs/firebase';
+import { Button } from 'primereact/button';
 
 const dataColumns = [
   'Rede',
@@ -17,7 +20,9 @@ const dataColumns = [
   'Telefone',
   'Observação',
   'Responsável por',
-  'Equipe'
+  'Equipe',
+  'Tipo do pagamento',
+  'Comprovante do pagamento'
 ];
 
 export default function TableInscritos({ inscritos, loading, columnsExtras, columnsDefault }) {
@@ -38,12 +43,13 @@ export default function TableInscritos({ inscritos, loading, columnsExtras, colu
     observacao: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
     criancas: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
     equipe: { value: null, matchMode: FilterMatchMode.IN },
+    'comprovante.tipoPagamento': { value: null, matchMode: FilterMatchMode.IN }
   });
 
   useEffect(() => {
     setCountRealRows(inscritos.length)
   }, [inscritos])
-  
+
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
     let _filters = { ...filters };
@@ -195,6 +201,40 @@ export default function TableInscritos({ inscritos, loading, columnsExtras, colu
         showFilterMatchModes={false}
         header="Equipe"
         sortable />
+      : null}
+    {visibleColumns.includes('Tipo do pagamento')
+      ? <Column
+        key="comprovante.tipoPagamento"
+        field="comprovante.tipoPagamento"
+        filterField="comprovante.tipoPagamento"
+        filter
+        filterElement={options => <MultiSelect filter value={options.value} options={['Dinheiro', 'Pix']} onChange={(e) => options.filterCallback(e.value)} placeholder="Filtrar por Tipo do pagamento" className="p-column-filter" />}
+        showFilterMatchModes={false}
+        header="Tipo do pagamento"
+        sortable />
+      : null}
+    {visibleColumns.includes('Comprovante do pagamento')
+      ? <Column
+        key="comprovante.referencia"
+        field="comprovante.referencia"
+        header="Comprovante do pagamento"
+        body={inscrito => {
+          switch (inscrito.comprovante.tipoPagamento) {
+            case 'Pix': return <Button
+              label='Visualizar comprovante'
+              icon='pi pi-search'
+              className='p-button-link'
+              size='small'
+              onClick={() => {
+                let refComprovante = ref(firebaseStorage, inscrito.comprovante.arquivo)
+                getDownloadURL(refComprovante)
+                  .then(url => window.open(url, '_blank'))
+              }}
+            />
+            case 'Dinheiro': return `Recebido por: ${inscrito.comprovante.quemRecebeu}`;
+            default: return '';
+          }
+        }} />
       : null}
     {
       columnsExtras

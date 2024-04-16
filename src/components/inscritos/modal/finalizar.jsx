@@ -82,11 +82,11 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
   const concluirInscricao = async data => {
     setLoading(true);
 
-    if (tipoPagamento === 'CONVIDADO') {
+    if (tipoPagamento === 'Convidado') {
       await salvarInscritos(null);
 
       await finalizarInscricao();
-    } else if (tipoPagamento === 'PIX') {
+    } else if (tipoPagamento === 'Pix') {
       let file = data.comprovante.item(0)
 
       let reader = new FileReader();
@@ -111,7 +111,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
       }
 
       reader.readAsDataURL(file);
-    } else if (tipoPagamento === 'DINHEIRO') {
+    } else if (tipoPagamento === 'Dinheiro') {
       let uuid = v4();
       
       await salvarComprovante(uuid, {
@@ -153,8 +153,8 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
                 tipoPagamento === 'PIX' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
                 "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
               )}>
-                <RadioButton inputId="PIXTipoId" value="PIX" onChange={(e) => setTipoPagamento('PIX')} checked={tipoPagamento === 'PIX'} />
-                PIX
+                <RadioButton inputId="PIXTipoId" value="PIX" onChange={(e) => setTipoPagamento('Pix')} checked={tipoPagamento === 'PIX'} />
+                Pix
               </label>
               {
                 permitirDinheiro === true
@@ -162,7 +162,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
                     tipoPagamento === 'DINHEIRO' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
                     "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
                   )}>
-                    <RadioButton inputId="DinheiroTipoId" value="DINHEIRO" onChange={(e) => setTipoPagamento('DINHEIRO')} checked={tipoPagamento === 'DINHEIRO'} />
+                    <RadioButton inputId="DinheiroTipoId" value="DINHEIRO" onChange={(e) => setTipoPagamento('Dinheiro')} checked={tipoPagamento === 'DINHEIRO'} />
                     Dinheiro
                   </label>
                   : null
@@ -172,8 +172,8 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
               tipoPagamento === 'CONVIDADO' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
               "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
             )}>
-              <RadioButton inputId="ConvidadoTipoId" value="CONVIDADO" onChange={(e) => setTipoPagamento('CONVIDADO')} checked={tipoPagamento === 'CONVIDADO'} />
-              CONVIDADO
+              <RadioButton inputId="ConvidadoTipoId" value="CONVIDADO" onChange={(e) => setTipoPagamento('Convidado')} checked={tipoPagamento === 'CONVIDADO'} />
+              Convidado
             </label>
         }
       </div>
@@ -185,7 +185,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
           </div>
         </div>
         {
-          tipoPagamento === 'PIX'
+          tipoPagamento === 'Pix'
             ? <div className="flex flex-col sm:flex-row py-2">
               <label className="text-base font-semibold w-64">Comprovante de pagamento *</label>
               <div className="flex flex-1 flex-col">
@@ -196,7 +196,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
             : null
         }
         {
-          tipoPagamento === 'DINHEIRO' ?
+          tipoPagamento === 'Dinheiro' ?
             <div className="flex flex-col sm:flex-row py-2">
               <label className="text-base font-semibold w-64">Quem Recebeu *</label>
               <div className="flex flex-1 flex-col">
