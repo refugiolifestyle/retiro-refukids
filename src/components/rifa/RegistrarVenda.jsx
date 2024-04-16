@@ -27,7 +27,7 @@ export const RegistrarVenda = ({ inscrito }) => {
             visible={visible}
             onHide={() => setVisible(false)}
             header="Registrar venda">
-            <div style={{ maxWidth: '600px', minWidth: '400px', width: '100%' }}>
+            <div style={{ maxWidth: '600px', width: '100%' }}>
                 <TabView>
                     <TabPanel header="Bloco" leftIcon="pi pi-th-large mr-2">
                         {
