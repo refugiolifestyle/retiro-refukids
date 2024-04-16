@@ -1,14 +1,12 @@
-import { Button } from 'primereact/button';
-import { Column } from "primereact/column";
-import { Avatar } from "primereact/avatar";
 import { Dialog } from 'primereact/dialog';
-import { Fragment, useEffect, useState } from 'react';
-import { useFieldArray, useForm } from "react-hook-form";
-import { useVendinhaService } from "../../services/useVendinhaService";
+import { Fragment, useState } from 'react';
+import { Button } from 'primereact/button';
 import { useRifaService } from '../../services/useRifaService';
+import { TabView, TabPanel } from 'primereact/tabview';
 
 export const RegistrarVenda = ({ inscrito }) => {
     const [visible, setVisible] = useState(false);
+    const [blockVisibility, setBlockVisibility] = useState("BLOCO");
     const { registrarVenda, loading } = useRifaService();
 
     const onNumeroClick = (inscrito, numero) => {
@@ -29,19 +27,40 @@ export const RegistrarVenda = ({ inscrito }) => {
             visible={visible}
             onHide={() => setVisible(false)}
             header="Registrar venda">
-            <div style={{ width: '560px' }}>
-                {
-                    Object.entries(inscrito.numeros)
-                        .map(([numero, comprador]) => <Button
-                            key={numero}
-                            label={numero}
-                            loading={loading}
-                            disabled={!!comprador}
-                            tooltip={comprador}
-                            tooltipOptions={{ position: "bottom", showOnDisabled: true }}
-                            className="p-button-outlined p-button-rounded w-12 h-12 p-1 m-1"
-                            onClick={() => onNumeroClick(inscrito, numero)} />)
-                }
+            <div style={{ maxWidth: '600px', minWidth: '400px', width: '100%' }}>
+                <TabView>
+                    <TabPanel header="Bloco" leftIcon="pi pi-th-large mr-2">
+                        {
+                            Object.entries(inscrito.numeros)
+                                .map(([numero, comprador]) => <Button
+                                    key={numero}
+                                    label={numero}
+                                    loading={loading}
+                                    disabled={!!comprador}
+                                    tooltip={comprador}
+                                    tooltipOptions={{ position: "bottom", showOnDisabled: true }}
+                                    className="p-button-outlined p-button-rounded w-12 h-12 p-1 m-1"
+                                    onClick={() => onNumeroClick(inscrito, numero)} />)
+                        }
+                    </TabPanel>
+                    <TabPanel header="Lista" rightIcon="pi pi-list ml-2">
+                        <div className='flex flex-col'>
+                            {
+                                Object.entries(inscrito.numeros)
+                                    .map(([numero, comprador]) => !!comprador
+                                        ? <div className='my-4'>
+                                            <b>{numero}:</b> {comprador}
+                                        </div>
+                                        : <Button
+                                            label={numero}
+                                            loading={loading}
+                                            className="p-button-outlined w-12 h-12 p-1 m-1"
+                                            onClick={() => onNumeroClick(inscrito, numero)} />
+                                    )
+                            }
+                        </div>
+                    </TabPanel>
+                </TabView>
             </div>
         </Dialog>
     </Fragment>;
