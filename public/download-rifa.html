@@ -17,7 +17,7 @@
         #flyer #nome {
             position: absolute;
             color: #000;
-            top: 2210px;
+            top: 5260px;
             left: 30px;
             width: 1155px;
             height: 155px;
@@ -33,7 +33,7 @@
             display: grid;
             grid-template-columns: repeat(10, 1fr);
             grid-template-rows: repeat(5, 1fr);
-            top: 1010px;
+            top: 4060px;
             left: 65px;
             width: 1100px;
             height: 700px;
@@ -67,6 +67,9 @@
 </head>
 
 <body>
+    <h1 style="margin-bottom: 3000px;">
+        Gerando a imagem, aguarde...
+    </h1>
     <div id="flyer">
         <img id="bg" src="rifa.jpg" alt="">
         <span id="nome">
@@ -74,9 +77,7 @@
         <div id="tabela">
         </div>
     </div>
-    <a id="link"></a>
     <script>
-        let link = document.getElementById("link")
         let nome = document.getElementById("nome")
         let tabela = document.getElementById("tabela")
 
@@ -85,7 +86,6 @@
         let numeros = JSON.parse(urlParams.get('numeros'))
 
         nome.innerText = identificador
-
         Object.entries(numeros)
             .forEach(([numero, vendido]) => {
                 tabela.innerHTML = tabela.innerHTML + `<span class="${vendido ? 'vendido' : ''}">${numero}</span>`
@@ -97,10 +97,7 @@
                 dpi: 300
             })
                 .then(canvas => {
-                    link.href = canvas.toDataURL("image/png")
-                    link.download = identificador
-                    link.innerText = identificador
-                    link.click()
+                    canvas.toBlob(blob => location.href = URL.createObjectURL(blob))
                 });
         }, 2000)
     </script>
