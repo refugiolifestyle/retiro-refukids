@@ -36,6 +36,7 @@ export default function Rifa() {
       columnsDefault={["Rede", "Nome"]}
       columnsExtras={[
         <Column
+          sortable
           key="rifaNumeros"
           header="Total vendido"
           body={linha => buildRifaNumerosColumns(linha)}>
