@@ -39,7 +39,7 @@ export const HeaderNavigation = ({ current }) => {
           alt="Workflow"
         />
       </div>
-      <div className="ml-10 flex items-baseline space-x-4 my-4">
+      <div className="flex items-baseline space-x-4 my-4">
         {!loading && navigation.map((item, itemIdx) =>
           <a
             key={item.title}

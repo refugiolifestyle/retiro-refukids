@@ -48,10 +48,13 @@ export const RegistrarVenda = ({ inscrito }) => {
                             {
                                 Object.entries(inscrito.numeros)
                                     .map(([numero, comprador]) => !!comprador
-                                        ? <div className='my-4'>
+                                        ? <div
+                                            key={numero}
+                                            className='my-4'>
                                             <b>{numero}:</b> {comprador}
                                         </div>
                                         : <Button
+                                            key={numero}
                                             label={numero}
                                             loading={loading}
                                             className="p-button-outlined w-12 h-12 p-1 m-1"
