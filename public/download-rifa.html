@@ -97,7 +97,7 @@
                 dpi: 300
             })
                 .then(canvas => {
-                    canvas.toBlob(blob => location.href = URL.createObjectURL(blob))
+                    canvas.toBlob(blob => document.write(`<img src='${URL.createObjectURL(blob)}' alt='Rifa ${identificador}' />`))
                 });
         }, 2000)
     </script>
