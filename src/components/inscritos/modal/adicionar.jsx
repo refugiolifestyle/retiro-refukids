@@ -9,8 +9,9 @@ import { MultiSelect } from 'primereact/multiselect';
 import { RadioButton } from "primereact/radiobutton";
 import { SelectButton } from 'primereact/selectbutton';
 import { classNames } from "primereact/utils";
+import { Checkbox } from 'primereact/checkbox';
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useConfigService } from '../../../services/useConfigService';
 import { useInscritosService } from '../../../services/useInscritosService';
 import { useRedesService } from "../../../services/useRedesService";
@@ -20,11 +21,11 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
   const redes = useRedesService();
   const equipes = useEquipesService();
   const { inscritos, loading } = useInscritosService();
-  const { permitirInscricao } = useConfigService();
+  const { permitirInscricao, permitirAdocao, tiosAdotivos } = useConfigService();
 
   const [visible, setVisible] = useState(false);
   const [tipoInscricao, setTipoInscricao] = useState(null);
-  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, control, watch, reset, formState: { errors } } = useForm();
 
   const onSubmit = data => {
     switch (tipoInscricao) {
@@ -32,6 +33,8 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
         delete data.nascimento
         delete data.observacao
         delete data.criancas
+        delete data.foiAdotada
+        delete data.quemAdotou
         break;
       case "CRIANCA":
         delete data.telefone
@@ -42,12 +45,16 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
         delete data.nascimento
         delete data.observacao
         delete data.equipe
+        delete data.foiAdotada
+        delete data.quemAdotou
         break;
       default:
         delete data.nascimento
         delete data.observacao
         delete data.equipe
         delete data.criancas
+        delete data.foiAdotada
+        delete data.quemAdotou
         break;
     }
     adicionarInscrito(data, tipoInscricao);
@@ -165,6 +172,31 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
                     <label className="text-base w-52">Observação</label>
                     <InputTextarea {...register('observacao')} rows={2} className="flex-1" />
                   </div>
+
+                  {
+                    permitirAdocao && <>
+                      <div className="flex flex-col sm:flex-row py-2 pb-5">
+                        <label htmlFor="foiAdotada" className="text-base w-52">Criança adotada</label>
+                        <Controller
+                          control={control}
+                          name="foiAdotada"
+                          render={({ field }) => (
+                            <Checkbox inputId="foiAdotada" trueValue={'Sim'} falseValue={'Não'} checked={field.value} {...field} />
+                          )}
+                        />
+                      </div>
+
+                      {
+                        watch('foiAdotada') === 'Sim' && <div className="flex flex-col sm:flex-row py-2">
+                          <label className="text-base w-52">Quem adotou *</label>
+                          <div className="flex flex-1 flex-col">
+                            <Dropdown value={watch('quemAdotou')} {...register('quemAdotou', { required: true })} options={tiosAdotivos} />
+                            {errors.quemAdotou && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
+                          </div>
+                        </div>
+                      }
+                    </>
+                  }
                 </>
                 : null
             }

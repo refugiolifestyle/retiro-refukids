@@ -16,7 +16,7 @@ import { uploadString, ref as storageRef } from 'firebase/storage';
 
 const deparaValores = {
   "Servo": 240,
-  "Criança": 150,
+  "Criança": 75,
   "Responsável": 240,
   "Convidado": 0
 }
@@ -38,6 +38,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
 
   const hideModal = () => {
     setVisible(false);
+    setLoading(false);
     setTipoPagamento(null);
     reset();
   }
@@ -48,7 +49,13 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
 
     await set(comprovanteRef, {
       tipoPagamento,
-      inscritos: inscritos.map(({ rede, cargo, nome }) => ({ rede, cargo, nome })),
+      inscritos: inscritos.map(i => ({ 
+        rede: i.rede, 
+        cargo: i.cargo, 
+        nome: i.nome,
+        cargo: i.cargo,
+        foiAdotada: !!i.foiAdotada
+      })),
       valor: getAmount(),
       data: new Date().toLocaleString("pt-BR"),
       ...pagamento
@@ -60,7 +67,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
   const salvarInscritos = async (comprovante) => {
     for (let inscrito of inscritos) {
       let inscritoRef = ref(firebaseDatabase, `inscritos/${inscrito.rede}/${inscrito.nome}`);
-      
+
       await set(inscritoRef, {
         ...parse(inscrito),
         comprovante
@@ -113,7 +120,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
       reader.readAsDataURL(file);
     } else if (tipoPagamento === 'Dinheiro') {
       let uuid = v4();
-      
+
       await salvarComprovante(uuid, {
         quemRecebeu: data.quemRecebeu
       })
@@ -129,6 +136,10 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
   }
 
   let getAmount = () => inscritos.reduce((am, inscrito) => {
+    if (inscrito.foiAdotada) {
+      return am
+    }
+
     return am + deparaValores[inscrito.cargo]
   }, 0.0);
 

@@ -22,7 +22,9 @@ const dataColumns = [
   'Responsável por',
   'Equipe',
   'Tipo do pagamento',
-  'Comprovante do pagamento'
+  'Comprovante do pagamento',
+  'Criança adotada',
+  'Quem adotou'
 ];
 
 export default function TableInscritos({ inscritos, loading, columnsExtras, columnsDefault }) {
@@ -43,7 +45,10 @@ export default function TableInscritos({ inscritos, loading, columnsExtras, colu
     observacao: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
     criancas: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
     equipe: { value: null, matchMode: FilterMatchMode.IN },
-    'comprovante.tipoPagamento': { value: null, matchMode: FilterMatchMode.IN }
+    'comprovante.tipoPagamento': { value: null, matchMode: FilterMatchMode.IN },
+    'comprovante.quemRecebeu': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
+    foiAdotada: { value: null, matchMode: FilterMatchMode.IN },
+    quemAdotou: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
   });
 
   useEffect(() => {
@@ -215,26 +220,51 @@ export default function TableInscritos({ inscritos, loading, columnsExtras, colu
       : null}
     {visibleColumns.includes('Comprovante do pagamento')
       ? <Column
-        key="comprovante.referencia"
-        field="comprovante.referencia"
+        key="comprovante.quemRecebeu"
+        field="comprovante.quemRecebeu"
         header="Comprovante do pagamento"
+        filterField="comprovante.quemRecebeu"
+        filterPlaceholder="Filtrar por Comprovante do pagamento"
+        filter
         body={inscrito => {
-          switch (inscrito.comprovante.tipoPagamento) {
-            case 'Pix': return <Button
-              label='Visualizar comprovante'
-              icon='pi pi-search'
-              className='p-button-link'
-              size='small'
-              onClick={() => {
-                let refComprovante = ref(firebaseStorage, inscrito.comprovante.arquivo)
-                getDownloadURL(refComprovante)
-                  .then(url => window.open(url, '_blank'))
-              }}
-            />
-            case 'Dinheiro': return `Recebido por: ${inscrito.comprovante.quemRecebeu}`;
-            default: return '';
+          if (inscrito && inscrito.comprovante && inscrito.comprovante.tipoPagamento) {
+            switch (inscrito.comprovante.tipoPagamento) {
+              case 'Pix': return <Button
+                label='Visualizar comprovante'
+                icon='pi pi-search'
+                className='p-button-link'
+                size='small'
+                onClick={() => {
+                  let refComprovante = ref(firebaseStorage, inscrito.comprovante.arquivo)
+                  getDownloadURL(refComprovante)
+                    .then(url => window.open(url, '_blank'))
+                }}
+              />
+              case 'Dinheiro': return `Recebido por: ${inscrito.comprovante.quemRecebeu}`;
+              default: return '';
+            }
           }
         }} />
+      : null}
+    {visibleColumns.includes('Criança adotada')
+      ? <Column
+        key="foiAdotada"
+        field="foiAdotada"
+        filterField="foiAdotada"
+        filter
+        filterElement={options => <MultiSelect filter value={options.value} options={['Sim', 'Não']} onChange={(e) => options.filterCallback(e.value)} placeholder="Filtrar por Criança adotada" className="p-column-filter" />}
+        showFilterMatchModes={false}
+        filterPlaceholder="Filtrar por Criança adotada"
+        header="Criança adotada" />
+      : null}
+    {visibleColumns.includes('Quem adotou')
+      ? <Column
+        key="quemAdotou"
+        field="quemAdotou"
+        filterField="quemAdotou"
+        filter
+        filterPlaceholder="Filtrar por Quem adotou"
+        header="Quem adotou" />
       : null}
     {
       columnsExtras
