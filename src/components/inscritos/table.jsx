@@ -9,6 +9,7 @@ import { useRedesService } from '../../services/useRedesService';
 import { getDownloadURL, ref } from 'firebase/storage';
 import { firebaseStorage } from '../../configs/firebase';
 import { Button } from 'primereact/button';
+import { VisualizarComprovantesModal } from './comprovantes';
 
 const dataColumns = [
   'Rede',
@@ -21,8 +22,8 @@ const dataColumns = [
   'Observação',
   'Responsável por',
   'Equipe',
-  'Tipo do pagamento',
-  'Comprovante do pagamento',
+  'Pagamentos efetuados',
+  'Comprovantes de pagamento',
   'Criança adotada',
   'Quem adotou'
 ];
@@ -45,8 +46,7 @@ export default function TableInscritos({ inscritos, loading, columnsExtras, colu
     observacao: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
     criancas: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
     equipe: { value: null, matchMode: FilterMatchMode.IN },
-    'comprovante.tipoPagamento': { value: null, matchMode: FilterMatchMode.IN },
-    'comprovante.quemRecebeu': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
+    situacaoPagamento: { value: null, matchMode: FilterMatchMode.IN },
     foiAdotada: { value: null, matchMode: FilterMatchMode.IN },
     quemAdotou: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
   });
@@ -103,7 +103,7 @@ export default function TableInscritos({ inscritos, loading, columnsExtras, colu
     sortOrder={1}
     sortMode="multiple"
     removableSort
-    dataKey="nome"
+    dataKey="uuid"
     filters={filters}>
     {visibleColumns.includes('Rede')
       ? <Column
@@ -207,44 +207,23 @@ export default function TableInscritos({ inscritos, loading, columnsExtras, colu
         header="Equipe"
         sortable />
       : null}
-    {visibleColumns.includes('Tipo do pagamento')
+    {visibleColumns.includes('Pagamentos efetuados')
       ? <Column
-        key="comprovante.tipoPagamento"
-        field="comprovante.tipoPagamento"
-        filterField="comprovante.tipoPagamento"
+        key="situacaoPagamento"
+        field="situacaoPagamento"
+        filterField="situacaoPagamento"
         filter
-        filterElement={options => <MultiSelect filter value={options.value} options={['Dinheiro', 'Pix']} onChange={(e) => options.filterCallback(e.value)} placeholder="Filtrar por Tipo do pagamento" className="p-column-filter" />}
+        filterElement={options => <MultiSelect filter value={options.value} options={['1ª Parcela', 'Todas parcelas']} onChange={(e) => options.filterCallback(e.value)} placeholder="Filtrar por Tipo do pagamento" className="p-column-filter" />}
         showFilterMatchModes={false}
-        header="Tipo do pagamento"
-        sortable />
+        filterPlaceholder="Filtrar por Pagamentos efetuados"
+        header="Pagamentos efetuados" />
       : null}
-    {visibleColumns.includes('Comprovante do pagamento')
+    {visibleColumns.includes('Comprovantes de pagamento')
       ? <Column
-        key="comprovante.quemRecebeu"
-        field="comprovante.quemRecebeu"
-        header="Comprovante do pagamento"
-        filterField="comprovante.quemRecebeu"
-        filterPlaceholder="Filtrar por Comprovante do pagamento"
-        filter
-        body={inscrito => {
-          if (inscrito && inscrito.comprovante && inscrito.comprovante.tipoPagamento) {
-            switch (inscrito.comprovante.tipoPagamento) {
-              case 'Pix': return <Button
-                label='Visualizar comprovante'
-                icon='pi pi-search'
-                className='p-button-link'
-                size='small'
-                onClick={() => {
-                  let refComprovante = ref(firebaseStorage, inscrito.comprovante.arquivo)
-                  getDownloadURL(refComprovante)
-                    .then(url => window.open(url, '_blank'))
-                }}
-              />
-              case 'Dinheiro': return `Recebido por: ${inscrito.comprovante.quemRecebeu}`;
-              default: return '';
-            }
-          }
-        }} />
+        key="comprovante"
+        field="comprovante"
+        header="Comprovantes de pagamento"
+        body={linha => <VisualizarComprovantesModal inscritos={linha} />} />
       : null}
     {visibleColumns.includes('Criança adotada')
       ? <Column

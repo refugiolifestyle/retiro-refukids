@@ -1,13 +1,9 @@
-import { Badge } from 'primereact/badge';
 import { Column } from 'primereact/column';
-import ListInscritos from '../components/inscritos/list';
-import { Page } from '../components/page';
-import { ComprasVendinhaModal } from '../components/vendinha/ComprasVendinhaModal';
-import { NovaCompraVendinhaModal } from '../components/vendinha/NovaCompraVendinhaModal';
-import { useRifaService } from '../services/useRifaService';
 import TableInscritos from '../components/inscritos/table';
-import { RegistrarVenda } from '../components/rifa/RegistrarVenda';
-import { BaixarCartao } from '../components/rifa/BaixarCartao';
+import { Page } from '../components/page';
+import { BaixarCartao } from '../components/rifa/baixar-cartao';
+import { RegistrarVenda } from '../components/rifa/registrar-vendas';
+import { useRifaService } from '../services/useRifaService';
 
 export default function Rifa() {
   const { rifa, loading } = useRifaService();

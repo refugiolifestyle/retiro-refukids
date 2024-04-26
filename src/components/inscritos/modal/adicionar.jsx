@@ -16,6 +16,7 @@ import { useConfigService } from '../../../services/useConfigService';
 import { useInscritosService } from '../../../services/useInscritosService';
 import { useRedesService } from "../../../services/useRedesService";
 import { useEquipesService } from "../../../services/useEquipesService";
+import { v4 } from 'uuid';
 
 export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
   const redes = useRedesService();
@@ -25,7 +26,7 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
 
   const [visible, setVisible] = useState(false);
   const [tipoInscricao, setTipoInscricao] = useState(null);
-  const { register, handleSubmit, control, watch, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
 
   const onSubmit = data => {
     switch (tipoInscricao) {
@@ -33,31 +34,42 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
         delete data.nascimento
         delete data.observacao
         delete data.criancas
-        delete data.foiAdotada
         delete data.quemAdotou
+        delete data.foiAdotada
         break;
       case "CRIANCA":
         delete data.telefone
         delete data.criancas
         delete data.equipe
+        delete data.situacaoPagamento
+
+        data.situacaoPagamento = "Todas parcelas"        
+        if (data.foiAdotada === 'Não') {
+          delete data.quemAdotou
+        }
         break;
       case "RESPONSAVEL":
         delete data.nascimento
         delete data.observacao
         delete data.equipe
-        delete data.foiAdotada
         delete data.quemAdotou
+        delete data.foiAdotada
         break;
       default:
         delete data.nascimento
         delete data.observacao
         delete data.equipe
         delete data.criancas
-        delete data.foiAdotada
+        delete data.situacaoPagamento
         delete data.quemAdotou
+        delete data.foiAdotada
         break;
     }
-    adicionarInscrito(data, tipoInscricao);
+
+    adicionarInscrito({
+      uuid: v4(),
+      ...data
+    }, tipoInscricao);
 
     hideModal();
   };
@@ -175,15 +187,12 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
 
                   {
                     permitirAdocao && <>
-                      <div className="flex flex-col sm:flex-row py-2 pb-5">
-                        <label htmlFor="foiAdotada" className="text-base w-52">Criança adotada</label>
-                        <Controller
-                          control={control}
-                          name="foiAdotada"
-                          render={({ field }) => (
-                            <Checkbox inputId="foiAdotada" trueValue={'Sim'} falseValue={'Não'} checked={field.value} {...field} />
-                          )}
-                        />
+                      <div className="flex flex-col sm:flex-row py-2">
+                        <label className="text-base w-52">Criança adotada *</label>
+                        <div className="flex flex-1 flex-col">
+                          <SelectButton {...register('foiAdotada', { required: true })} options={['Sim', 'Não']} value={watch('foiAdotada')} />
+                          {errors.foiAdotada && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
+                        </div>
                       </div>
 
                       {
@@ -234,7 +243,6 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
                 </>
                 : null
             }
-
             {
               tipoInscricao === 'SERVO'
                 ? <>
@@ -246,6 +254,18 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
                     </div>
                   </div>
                 </>
+                : null
+            }
+            {
+              ['RESPONSAVEL', 'SERVO'].includes(tipoInscricao)
+                ?
+                <div className="flex flex-col sm:flex-row py-2">
+                  <label className="text-base w-52">Pagamento *</label>
+                  <div className="flex flex-1 flex-col">
+                    <SelectButton {...register('situacaoPagamento', { required: true })} options={['1ª Parcela', 'Todas parcelas']} value={watch('situacaoPagamento')} />
+                    {errors.situacaoPagamento && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
+                  </div>
+                </div>
                 : null
             }
             <div className="flex flex-1 justify-end items-center mt-8">

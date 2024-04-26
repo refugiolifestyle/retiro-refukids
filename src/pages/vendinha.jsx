@@ -2,8 +2,8 @@ import { Badge } from 'primereact/badge';
 import { Column } from 'primereact/column';
 import ListInscritos from '../components/inscritos/list';
 import { Page } from '../components/page';
-import { ComprasVendinhaModal } from '../components/vendinha/ComprasVendinhaModal';
-import { NovaCompraVendinhaModal } from '../components/vendinha/NovaCompraVendinhaModal';
+import { ComprasVendinhaModal } from '../components/vendinha/modal/compras';
+import { NovaCompraVendinhaModal } from '../components/vendinha/modal/nova-compra';
 import { useVendinhaService } from '../services/useVendinhaService';
 
 export default function Vendinha() {

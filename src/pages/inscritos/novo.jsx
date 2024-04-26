@@ -6,6 +6,7 @@ import { FinalizarModalInscrito } from '../../components/inscritos/modal/finaliz
 import TableInscritos from '../../components/inscritos/table';
 import { Page } from '../../components/page';
 import { useInscrito } from '../../hooks/useInscrito';
+import { Column } from 'primereact/column';
 
 const deparaCargo = {
   'SERVO': "Servo",
@@ -64,12 +65,16 @@ export default function Novo() {
     <TableInscritos
       inscritos={inscritosAdded}
       loading={false}
-      actions={linha =>
-        <button
-          onClick={() => removeInscrito(linha)}
-          className="bg-red-700 text-white px-3 py-2 rounded-md text-sm font-bold">
-          X
-        </button>
-      } />
+      columnsDefault={["Rede", "Cargo", "Nome", "Sexo", "Dt. Nascimento", "Situação do pagamento", "Criança adotada"]}
+      columnsExtras={[
+        <Column
+          key="excluirLinha"
+          header=""
+          body={linha => <button
+            onClick={() => removeInscrito(linha)}
+            className="bg-red-700 text-white px-3 py-2 rounded-md text-sm font-bold">
+            X
+          </button>} />
+      ]} />
   </Page>
 }

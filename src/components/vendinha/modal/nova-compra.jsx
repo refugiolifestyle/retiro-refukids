@@ -4,7 +4,7 @@ import { DataTable } from "primereact/datatable";
 import { Dialog } from 'primereact/dialog';
 import { Fragment, useEffect, useState } from 'react';
 import { useFieldArray, useForm } from "react-hook-form";
-import { useVendinhaService } from "../../services/useVendinhaService";
+import { useVendinhaService } from "../../../services/useVendinhaService";
 
 export const NovaCompraVendinhaModal = ({ inscrito, produtos }) => {
     const [visible, setVisible] = useState(false);
