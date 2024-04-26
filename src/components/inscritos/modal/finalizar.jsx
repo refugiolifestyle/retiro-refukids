@@ -136,7 +136,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
   }
 
   let getAmount = () => inscritos.reduce((am, inscrito) => {
-    if (inscrito.foiAdotada) {
+    if (inscrito.foiAdotada === 'Sim') {
       return am
     }
 
