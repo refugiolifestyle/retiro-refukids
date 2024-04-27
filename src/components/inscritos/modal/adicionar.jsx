@@ -22,7 +22,7 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
   const redes = useRedesService();
   const equipes = useEquipesService();
   const { inscritos, loading } = useInscritosService();
-  const { permitirInscricao, permitirAdocao, tiosAdotivos } = useConfigService();
+  const { permitirInscricao, permitirAdocao, tiosAdotivos, loading: loadingConfig } = useConfigService();
 
   const [visible, setVisible] = useState(false);
   const [tipoInscricao, setTipoInscricao] = useState(null);
@@ -43,7 +43,7 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
         delete data.equipe
         delete data.situacaoPagamento
 
-        data.situacaoPagamento = "Todas parcelas"        
+        data.situacaoPagamento = "Todas parcelas"
         if (data.foiAdotada === 'Não') {
           delete data.quemAdotou
         }
@@ -199,7 +199,13 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
                         watch('foiAdotada') === 'Sim' && <div className="flex flex-col sm:flex-row py-2">
                           <label className="text-base w-52">Quem adotou *</label>
                           <div className="flex flex-1 flex-col">
-                            <Dropdown value={watch('quemAdotou')} {...register('quemAdotou', { required: true })} options={tiosAdotivos} />
+                            <Dropdown
+                              value={watch('quemAdotou')}
+                              options={tiosAdotivos}
+                              filter
+                              emptyFilterMessage="Nenhum tio encontrado"
+                              placeholder={loadingConfig ? "Carregando..." : "Selecione o tio que adotou"}
+                              {...register('quemAdotou', { required: true })} />
                             {errors.quemAdotou && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
                           </div>
                         </div>
