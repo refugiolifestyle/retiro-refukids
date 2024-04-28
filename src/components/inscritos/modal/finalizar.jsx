@@ -28,7 +28,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
   const [loading, setLoading] = useState(false);
   const [tipoPagamento, setTipoPagamento] = useState(null);
   const { query } = useRouter();
-  const { permitirDinheiro, permitirInscricao } = useConfigService();
+  const { permitirDinheiro, permitirInscricao, permitirVendinha } = useConfigService();
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const { parse } = useInscrito();
 
@@ -200,13 +200,19 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
                   : null
               }
             </>
-            : <label htmlFor="ConvidadoTipoId" className={classNames(
+            : null
+        }
+        {
+          permitirVendinha
+            && router.query.redirectUrl === '/vendinha'
+            ? <label htmlFor="ConvidadoTipoId" className={classNames(
               tipoPagamento === 'Convidado' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
               "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
             )}>
               <RadioButton inputId="ConvidadoTipoId" value="Convidado" onChange={(e) => setTipoPagamento('Convidado')} checked={tipoPagamento === 'Convidado'} />
               Convidado
             </label>
+            : null
         }
       </div>
       <form onSubmit={handleSubmit(concluirInscricao)} className='mt-4'>
