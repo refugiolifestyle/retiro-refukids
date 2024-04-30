@@ -12,14 +12,17 @@ export default function Relatorio() {
   
   useEffect(() => {
     window.inscritos = inscritos
+    console.log('Inscritos atualizados', new Date().toLocaleString('pt-br'))
   }, [inscritos])
 
   useEffect(() => {
     window.rifas = rifa
+    console.log('Rifas atualizados', new Date().toLocaleString('pt-br'))
   }, [rifa])
 
   useEffect(() => {
     window.comprovantes = comprovantes
+    console.log('Comprovantes atualizados', new Date().toLocaleString('pt-br'))
   }, [comprovantes])
 
   useEffect(() => {
