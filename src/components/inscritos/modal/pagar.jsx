@@ -139,12 +139,16 @@ export const Pagar2ParcelaModal = ({ inscritos, toast }) => {
   }, 0.0);
 
   return <>
-    <Button
-      text
-      onClick={() => setVisible(true)}
-      label="2ª Parcela"
-      icon="pi pi-wallet"
-      className="bg-white text-black px-3 py-2 rounded-md text-sm font-medium" />
+    {
+      permitirInscricao === true
+        ? <Button
+          text
+          onClick={() => setVisible(true)}
+          label="2ª Parcela"
+          icon="pi pi-wallet"
+          className="bg-white text-black px-3 py-2 rounded-md text-sm font-medium" />
+        : null
+    }
     <Dialog
       header="Pagamento da 2ª parcela"
       visible={visible}
@@ -152,35 +156,23 @@ export const Pagar2ParcelaModal = ({ inscritos, toast }) => {
       style={{ width: '50vw' }}
       onHide={hideModal}>
       <div className="flex flex-col sm:flex-row gap-6">
+        <label htmlFor="PixTipoId" className={classNames(
+          tipoPagamento === 'Pix' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
+          "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
+        )}>
+          <RadioButton inputId="PixTipoId" value="Pix" onChange={(e) => setTipoPagamento('Pix')} checked={tipoPagamento === 'Pix'} />
+          Pix
+        </label>
         {
-          permitirInscricao === true
-            ? <>
-              <label htmlFor="PixTipoId" className={classNames(
-                tipoPagamento === 'Pix' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
-                "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
-              )}>
-                <RadioButton inputId="PixTipoId" value="Pix" onChange={(e) => setTipoPagamento('Pix')} checked={tipoPagamento === 'Pix'} />
-                Pix
-              </label>
-              {
-                permitirDinheiro === true
-                  ? <label htmlFor="DinheiroTipoId" className={classNames(
-                    tipoPagamento === 'Dinheiro' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
-                    "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
-                  )}>
-                    <RadioButton inputId="DinheiroTipoId" value="Dinheiro" onChange={(e) => setTipoPagamento('Dinheiro')} checked={tipoPagamento === 'Dinheiro'} />
-                    Dinheiro
-                  </label>
-                  : null
-              }
-            </>
-            : <label htmlFor="ConvidadoTipoId" className={classNames(
-              tipoPagamento === 'Convidado' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
+          permitirDinheiro === true
+            ? <label htmlFor="DinheiroTipoId" className={classNames(
+              tipoPagamento === 'Dinheiro' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
               "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
             )}>
-              <RadioButton inputId="ConvidadoTipoId" value="Convidado" onChange={(e) => setTipoPagamento('Convidado')} checked={tipoPagamento === 'Convidado'} />
-              Convidado
+              <RadioButton inputId="DinheiroTipoId" value="Dinheiro" onChange={(e) => setTipoPagamento('Dinheiro')} checked={tipoPagamento === 'Dinheiro'} />
+              Dinheiro
             </label>
+            : null
         }
       </div>
       <form onSubmit={handleSubmit(concluirInscricao)} className='mt-4'>
