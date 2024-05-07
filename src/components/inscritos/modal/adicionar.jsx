@@ -25,7 +25,7 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
 
   const { query } = useRouter();
   const { inscritos, loading } = useInscritosService();
-  const { permitirInscricao, permitirAdocao, permitirVendinha, tiosAdotivos, loading: loadingConfig } = useConfigService();
+  const { permitirInscricao, permitirInscricaoList, permitirAdocao, permitirVendinha, tiosAdotivos, loading: loadingConfig } = useConfigService();
 
   const [visible, setVisible] = useState(false);
   const [tipoInscricao, setTipoInscricao] = useState(null);
@@ -111,29 +111,41 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
           : <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col sm:flex-row gap-6">
               {
-                permitirInscricao === true
+                true === true
                   ? <>
-                    <label htmlFor="servoTipoId" className={classNames(
-                      tipoInscricao === 'SERVO' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
-                      "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
-                    )}>
-                      <RadioButton inputId="servoTipoId" value="SERVO" onChange={(e) => setTipoInscricao('SERVO')} checked={tipoInscricao === 'SERVO'} />
-                      Servo
-                    </label>
-                    <label htmlFor="criancaTipoId" className={classNames(
-                      tipoInscricao === 'CRIANCA' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
-                      "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
-                    )}>
-                      <RadioButton inputId="criancaTipoId" value="CRIANCA" onChange={(e) => setTipoInscricao('CRIANCA')} checked={tipoInscricao === 'CRIANCA'} />
-                      Criança
-                    </label>
-                    <label htmlFor="responsavelTipoId" className={classNames(
-                      tipoInscricao === 'RESPONSAVEL' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
-                      "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
-                    )}>
-                      <RadioButton inputId="responsavelTipoId" value="RESPONSAVEL" onChange={(e) => setTipoInscricao('RESPONSAVEL')} checked={tipoInscricao === 'RESPONSAVEL'} />
-                      Responsável
-                    </label>
+                    {
+                      permitirInscricaoList['SERVO']
+                        ? <label htmlFor="servoTipoId" className={classNames(
+                          tipoInscricao === 'SERVO' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
+                          "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
+                        )}>
+                          <RadioButton inputId="servoTipoId" value="SERVO" onChange={(e) => setTipoInscricao('SERVO')} checked={tipoInscricao === 'SERVO'} />
+                          Servo
+                        </label>
+                        : null
+                    }
+                    {
+                      permitirInscricaoList['CRIANCA']
+                        ? <label htmlFor="criancaTipoId" className={classNames(
+                          tipoInscricao === 'CRIANCA' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
+                          "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
+                        )}>
+                          <RadioButton inputId="criancaTipoId" value="CRIANCA" onChange={(e) => setTipoInscricao('CRIANCA')} checked={tipoInscricao === 'CRIANCA'} />
+                          Criança
+                        </label>
+                        : null
+                    }
+                    {
+                      permitirInscricaoList['RESPONSAVEL']
+                        ? <label htmlFor="responsavelTipoId" className={classNames(
+                          tipoInscricao === 'RESPONSAVEL' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
+                          "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
+                        )}>
+                          <RadioButton inputId="responsavelTipoId" value="RESPONSAVEL" onChange={(e) => setTipoInscricao('RESPONSAVEL')} checked={tipoInscricao === 'RESPONSAVEL'} />
+                          Responsável
+                        </label>
+                        : null
+                    }
                   </>
                   : null
               }
