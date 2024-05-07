@@ -22,7 +22,7 @@ export const Pagar2ParcelaModal = ({ inscritos, toast }) => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tipoPagamento, setTipoPagamento] = useState(null);
-  const { permitirDinheiro, permitirInscricao } = useConfigService();
+  const { permitirDinheiro, permitirPagamentoParcelas } = useConfigService();
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   useEffect(() => {
@@ -140,7 +140,7 @@ export const Pagar2ParcelaModal = ({ inscritos, toast }) => {
 
   return <>
     {
-      permitirInscricao === true
+      permitirPagamentoParcelas === true
         ? <Button
           text
           onClick={() => setVisible(true)}
