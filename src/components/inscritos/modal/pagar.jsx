@@ -14,7 +14,7 @@ import { uploadString, ref as storageRef } from 'firebase/storage';
 const deparaValores = {
   "Servo": 240,
   "Criança": 75,
-  "Responsável": 240,
+  "Responsável": 200,
   "Convidado": 0
 }
 
