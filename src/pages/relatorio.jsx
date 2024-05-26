@@ -3,6 +3,7 @@ import { Page } from '../components/page';
 import { useInscritosService } from '../services/useInscritosService';
 import { useRifaService } from '../services/useRifaService';
 import { useComprovantesService } from '../services/useComprovantesService';
+import { Button } from 'primereact/button';
 
 export default function Relatorio() {
   const {inscritos} = useInscritosService();
@@ -26,7 +27,10 @@ export default function Relatorio() {
 
   return <Page title="Relatórios">
     <div className='flex flex-col justify-center items-center gap-4'>
-      <p className='text-4xl text-black font-semibold'>Relatórios</p>
+      <Button label='Números para Rifa' onClick={async () => {
+        let text = rifa.reduce((a, r) => a.concat(Object.entries(r.numeros).filter(([n, v]) => v !== false).map(([n, v]) => `${n}: ${v.replaceAll(/(\s+|-)/gi, ' ')} (Vendedor(a) ${r.nome} )`)), []).join('\n')
+        await navigator.clipboard.writeText(text)
+      }} />
     </div>
   </Page>
 }
