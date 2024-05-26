@@ -76,7 +76,7 @@ export const Pagar2ParcelaModal = ({ inscritos, toast }) => {
       ]);
 
       let situacaoPagamentoRef = ref(firebaseDatabase, `inscritos/${inscrito.rede}/${inscrito.nome}/situacaoPagamento`);
-      await set(situacaoPagamentoRef, "Todas Parcelas");
+      await set(situacaoPagamentoRef, "Todas parcelas");
     }
   }
 
