@@ -26,8 +26,7 @@ export default function Relatorio() {
       .reduce((a, r) => {
         let numerosPreparados = Object
           .entries(r.numeros)
-          .filter(([n, v]) => !!v)
-          .map(([n, v]) => `${n}: ${v.replaceAll(/(\s+|-)/gi, ' ')} (Vendedor(a) ${r.nome})`)
+          .map(([n, v]) => `${n}: ${r.nome} (${v.replaceAll(/(\s+|-)/gi, ' ')})`)
         return a.concat(numerosPreparados)
       }, [])
       .sort((n, n2) => collactor.compare(n, n2))
