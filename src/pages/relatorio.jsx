@@ -35,7 +35,7 @@ export default function Relatorio() {
               .replaceAll(/(\s{2,}|-)/gi, '')
               .trim()
               
-            return `${n}: ${r.nome} (Vendido para ${comprador})`
+            return `${n}: ${r.nome} (${comprador})`
           })
         return a.concat(numerosPreparados)
       }, [])
