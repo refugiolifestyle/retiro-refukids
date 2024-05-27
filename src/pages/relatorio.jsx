@@ -31,7 +31,10 @@ export default function Relatorio() {
               return `${n}: ${r.nome}`
             }
             
-            let comprador = v.replaceAll(/(\s{2,}|-)/gi, '')
+            let comprador = v
+              .replaceAll(/(\s{2,}|-)/gi, '')
+              .trim()
+              
             return `${n}: ${r.nome} (Vendido para ${comprador})`
           })
         return a.concat(numerosPreparados)
