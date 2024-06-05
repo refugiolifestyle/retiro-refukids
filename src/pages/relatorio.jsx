@@ -30,11 +30,11 @@ export default function Relatorio() {
             if (!v) {
               return `${n}: ${r.nome}`
             }
-            
+
             let comprador = v
               .replaceAll(/(\s{2,}|-)/gi, '')
               .trim()
-              
+
             return `${n}: ${r.nome} (Vendido para: ${comprador})`
           })
         return a.concat(numerosPreparados)
@@ -46,12 +46,72 @@ export default function Relatorio() {
     toast.current.show({ severity: 'success', summary: 'Sucesso', detail: 'Lista copiada com sucesso' });
   }
 
+  const gerarListaParaQuartos = async () => {
+    let Quartos = { Feminino: [], Masculino: [] }
+    let collator = new Intl.Collator('pt-BR', { numeric: true });
+
+    inscritos
+      .filter(inscrito => inscrito.cargo === "Criança")
+      .map(crianca => {
+        return {
+          ...crianca,
+          responsaveis: inscritos.filter(i => i.cargo === "Responsável" && i.criancas.includes(crianca.nome))
+        }
+      })
+      .sort((a, b) => {
+        return collator.compare(`${a.rede}${a.responsaveis.join('')}`, `${b.rede}${b.responsaveis.join('')}`)
+      })
+      .forEach(({ responsaveis, ...crianca }) => {
+        if (responsaveis.length === 1) {
+          let [responsavel] = responsaveis;
+          Quartos[responsavel.sexo].push(crianca);
+          Quartos[responsavel.sexo].push(responsaveis);
+        }
+        else {
+          Quartos[crianca.sexo].push(crianca);
+
+          let rF = responsaveis.filter(r => r.sexo === 'Feminino');
+          Quartos.Feminino = Quartos.Feminino.concat(rF);
+
+          let rM = responsaveis.filter(r => r.sexo === 'Masculino');
+          Quartos.Masculino = Quartos.Masculino.concat(rM);
+        }
+      })
+
+    Quartos = Object.fromEntries(
+      Object.entries(Quartos)
+        .map(([sexo, lista]) => {
+          return [
+            sexo,
+            lista
+              .filter((value, index, array) => array.lastIndexOf(value) === index)
+              .map(inscrito => `${inscrito.rede} - ${inscrito.nome} (${inscrito.cargo})`)
+          ]
+        })
+    )
+
+    inscritos
+      .filter(c => c.cargo === "Servo")
+      .sort(function (a, b) {
+        return collator.compare(`${a.rede}${a.nome}`, `${b.rede}${b.nome}`)
+      })
+      .forEach(servo => Quartos[servo.sexo].push(`${servo.rede} - ${servo.nome} (${servo.cargo})`))
+
+    let clipboardText = `Feminino\n${Quartos.Feminino.join('\n')}\n\nMasculino\n${Quartos.Masculino.join('\n')}`
+    await navigator.clipboard.writeText(clipboardText)
+
+    toast.current.show({ severity: 'success', summary: 'Sucesso', detail: 'Lista copiada com sucesso' });
+  }
+
   return <Page title="Relatórios">
     <Toast ref={toast} />
     <div className='flex flex-col md:flex-row justify-center items-center gap-4'>
       <Button
-        label='Números para sorteio'
+        label='Números para sorteio da Rifa'
         onClick={gerarNumerosParaSorteio} />
+        <Button
+        label='Lista de nomes para quartos'
+        onClick={gerarListaParaQuartos} />
     </div>
   </Page>
 }
