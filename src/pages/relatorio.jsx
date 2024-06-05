@@ -59,7 +59,7 @@ export default function Relatorio() {
         }
       })
       .sort((a, b) => {
-        return collator.compare(`${a.rede}${a.responsaveis.join('')}`, `${b.rede}${b.responsaveis.join('')}`)
+        return collator.compare(`${a.rede}${a.responsaveis.map(r => r.nome).join('')}`, `${b.rede}${b.responsaveis.map(r => r.nome).join('')}`)
       })
       .forEach(({ responsaveis, ...crianca }) => {
         if (responsaveis.length === 1) {
