@@ -78,6 +78,15 @@ export default function Relatorio() {
         }
       })
 
+    inscritos
+      .filter(c => c.cargo === "Servo")
+      .sort(function (a, b) {
+        return collator.compare(`${a.rede}${a.nome}`, `${b.rede}${b.nome}`)
+      })
+      .forEach(servo => {
+        Quartos[servo.sexo].push(servo)
+      })
+
     Quartos = Object.fromEntries(
       Object.entries(Quartos)
         .map(([sexo, lista]) => {
@@ -89,13 +98,6 @@ export default function Relatorio() {
           ]
         })
     )
-
-    inscritos
-      .filter(c => c.cargo === "Servo")
-      .sort(function (a, b) {
-        return collator.compare(`${a.rede}${a.nome}`, `${b.rede}${b.nome}`)
-      })
-      .forEach(servo => Quartos[servo.sexo].push(`${servo.rede} - ${servo.nome} (${servo.cargo})`))
 
     let clipboardText = `Feminino\n${Quartos.Feminino.join('\n')}\n\nMasculino\n${Quartos.Masculino.join('\n')}`
     await navigator.clipboard.writeText(clipboardText)
@@ -109,7 +111,7 @@ export default function Relatorio() {
       <Button
         label='Números para sorteio da Rifa'
         onClick={gerarNumerosParaSorteio} />
-        <Button
+      <Button
         label='Lista de nomes para quartos'
         onClick={gerarListaParaQuartos} />
     </div>
