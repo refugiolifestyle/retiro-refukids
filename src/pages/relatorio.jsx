@@ -65,7 +65,7 @@ export default function Relatorio() {
         if (responsaveis.length === 1) {
           let [responsavel] = responsaveis;
           Quartos[responsavel.sexo].push(crianca);
-          Quartos[responsavel.sexo].push(responsaveis);
+          Quartos[responsavel.sexo].push(responsavel);
         }
         else {
           Quartos[crianca.sexo].push(crianca);
@@ -95,11 +95,12 @@ export default function Relatorio() {
             lista
               .filter((value, index, array) => array.lastIndexOf(value) === index)
               .map(inscrito => `${inscrito.rede} - ${inscrito.nome} (${inscrito.cargo})`)
+              .join('\n')
           ]
         })
     )
 
-    let clipboardText = `Feminino\n${Quartos.Feminino.join('\n')}\n\nMasculino\n${Quartos.Masculino.join('\n')}`
+    let clipboardText = `Feminino\n${Quartos.Feminino}\n\n---------------------------\n\nMasculino\n${Quartos.Masculino}`
     await navigator.clipboard.writeText(clipboardText)
 
     toast.current.show({ severity: 'success', summary: 'Sucesso', detail: 'Lista copiada com sucesso' });
