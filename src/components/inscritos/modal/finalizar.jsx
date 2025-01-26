@@ -28,7 +28,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
   const [loading, setLoading] = useState(false);
   const [tipoPagamento, setTipoPagamento] = useState(null);
   const { query } = useRouter();
-  const { permitirDinheiro, permitirInscricao, permitirVendinha } = useConfigService();
+  const { permitirDinheiro, permitirPix, permitirInscricao, permitirVendinha } = useConfigService();
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const { parse } = useInscrito();
 
@@ -78,7 +78,11 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
       if (comprovante) {
         await set(inscritoRef, {
           ...parse(inscrito),
-          comprovante: [comprovante]
+          comprovante: [{
+            ...comprovante,
+            valor: deparaValores[inscrito.cargo] / 4,
+            parcelas: [inscrito.situacaoPagamento]
+          }]
         });
       } else {
         await set(inscritoRef, { ...parse(inscrito) });
@@ -137,9 +141,9 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
       })
 
       await salvarInscritos({
+        tipoPagamento,
         referencia: uuid,
-        quemRecebeu: data.quemRecebeu,
-        tipoPagamento
+        quemRecebeu: data.quemRecebeu
       });
 
       await finalizarInscricao();
@@ -151,17 +155,8 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
       return am
     }
 
-    if (
-      ['Responsável', 'Servo'].includes(inscrito.cargo)
-      && inscrito.situacaoPagamento
-      && inscrito.situacaoPagamento === '1ª Parcela'
-    ) {
-      let deparaValor = deparaValores[inscrito.cargo]
-
-      return am + (deparaValor / 4)
-    }
-
-    return am + deparaValores[inscrito.cargo]
+    let deparaValor = deparaValores[inscrito.cargo]
+    return am + (deparaValor / 4)
   }, 0.0);
 
   return <>
@@ -181,13 +176,17 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
         {
           permitirInscricao === true
             ? <>
-              <label htmlFor="PixTipoId" className={classNames(
-                tipoPagamento === 'Pix' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
-                "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
-              )}>
-                <RadioButton inputId="PixTipoId" value="Pix" onChange={(e) => setTipoPagamento('Pix')} checked={tipoPagamento === 'Pix'} />
-                Pix
-              </label>
+              {
+                permitirPix === true
+                  ? <label htmlFor="PixTipoId" className={classNames(
+                    tipoPagamento === 'Pix' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
+                    "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
+                  )}>
+                    <RadioButton inputId="PixTipoId" value="Pix" onChange={(e) => setTipoPagamento('Pix')} checked={tipoPagamento === 'Pix'} />
+                    Pix
+                  </label>
+                  : null
+              }
               {
                 permitirDinheiro === true
                   ? <label htmlFor="DinheiroTipoId" className={classNames(

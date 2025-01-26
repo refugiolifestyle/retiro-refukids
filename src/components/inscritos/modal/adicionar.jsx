@@ -45,7 +45,6 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
         delete data.criancas
         delete data.equipe
 
-        data.situacaoPagamento = "Todas parcelas"
         if (data.foiAdotada === 'Não') {
           delete data.quemAdotou
         }
