@@ -15,9 +15,9 @@ import { useConfigService } from '../../../services/useConfigService';
 import { uploadString, ref as storageRef } from 'firebase/storage';
 
 const deparaValores = {
-  "Servo": 240,
-  "Criança": 75,
-  "Responsável": 240,
+  "Servo": 260,
+  "Criança": 170,
+  "Responsável": 270,
   "Convidado": 0
 }
 
@@ -54,7 +54,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
           rede: i.rede,
           nome: i.nome,
           cargo: i.cargo,
-          situacaoPagamento: i.situacaoPagamento || "Todas parcelas"
+          situacaoPagamento: i.situacaoPagamento
         }
 
         if (i.foiAdotada) {
@@ -158,7 +158,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
     ) {
       let deparaValor = deparaValores[inscrito.cargo]
 
-      return am + (deparaValor / 2)
+      return am + (deparaValor / 4)
     }
 
     return am + deparaValores[inscrito.cargo]

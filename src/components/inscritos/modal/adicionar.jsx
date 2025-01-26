@@ -44,7 +44,6 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
         delete data.telefone
         delete data.criancas
         delete data.equipe
-        delete data.situacaoPagamento
 
         data.situacaoPagamento = "Todas parcelas"
         if (data.foiAdotada === 'Não') {
@@ -288,18 +287,13 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
                     </>
                     : null
                 }
-                {
-                  ['RESPONSAVEL', 'SERVO'].includes(tipoInscricao)
-                    ?
-                    <div className="flex flex-col sm:flex-row py-2">
-                      <label className="text-base w-52">Pagamento *</label>
-                      <div className="flex flex-1 flex-col">
-                        <SelectButton {...register('situacaoPagamento', { required: true })} options={['1ª Parcela', 'Todas parcelas']} value={watch('situacaoPagamento')} />
-                        {errors.situacaoPagamento && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
-                      </div>
-                    </div>
-                    : null
-                }
+                <div className="flex flex-col sm:flex-row py-2">
+                  <label className="text-base w-52">Pagamento *</label>
+                  <div className="flex flex-1 flex-col">
+                    <SelectButton {...register('situacaoPagamento', { required: true })} options={['1ª Parcela']} value={watch('situacaoPagamento')} />
+                    {errors.situacaoPagamento && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
+                  </div>
+                </div>
                 <div className="flex flex-1 justify-end items-center mt-8">
                   <button
                     onClick={hideModal}

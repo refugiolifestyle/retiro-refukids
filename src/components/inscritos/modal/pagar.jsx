@@ -12,9 +12,9 @@ import { useConfigService } from '../../../services/useConfigService';
 import { uploadString, ref as storageRef } from 'firebase/storage';
 
 const deparaValores = {
-  "Servo": 240,
-  "Criança": 75,
-  "Responsável": 200,
+  "Servo": 260,
+  "Criança": 170,
+  "Responsável": 270,
   "Convidado": 0
 }
 
@@ -135,7 +135,7 @@ export const Pagar2ParcelaModal = ({ inscritos, toast }) => {
 
   let getAmount = () => inscritos.reduce((am, inscrito) => {
     let deparaValor = deparaValores[inscrito.cargo]
-    return am + (deparaValor / 2)
+    return am + (deparaValor / 4)
   }, 0.0);
 
   return <>
