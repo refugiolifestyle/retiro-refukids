@@ -65,7 +65,7 @@ export default function Novo() {
     <TableInscritos
       inscritos={inscritosAdded}
       loading={false}
-      columnsDefault={["Rede", "Cargo", "Nome", "Sexo", "Dt. Nascimento", "Situação do pagamento", "Criança adotada"]}
+      columnsDefault={["Rede", "Cargo", "Nome", "Sexo", "Dt. Nascimento", "Criança adotada"]}
       columnsExtras={[
         <Column
           key="excluirLinha"

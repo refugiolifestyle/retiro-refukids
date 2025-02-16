@@ -28,7 +28,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
   const [loading, setLoading] = useState(false);
   const [tipoPagamento, setTipoPagamento] = useState(null);
   const { query } = useRouter();
-  const { permitirDinheiro, permitirPix, permitirInscricao, permitirVendinha } = useConfigService();
+  const { permitirDinheiro, permitirPix, permitirInscricao, permitirVendinha, pagamentos } = useConfigService();
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const { parse } = useInscrito();
 
@@ -54,7 +54,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
           rede: i.rede,
           nome: i.nome,
           cargo: i.cargo,
-          situacaoPagamento: i.situacaoPagamento
+          parcelas: i.situacaoPagamento.map(m => m.parcela),
         }
 
         if (i.foiAdotada) {
@@ -80,13 +80,16 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
           ...parse(inscrito),
           comprovante: [{
             ...comprovante,
-            valor: deparaValores[inscrito.cargo] / 4,
-            parcelas: [inscrito.situacaoPagamento]
+            valor: inscrito.situacaoPagamento.reduce((acc, a) => acc + Number.parseFloat(a.valor), 0),
+            parcelas: inscrito.situacaoPagamento.map(m => m.parcela)
           }]
         });
       } else {
         await set(inscritoRef, { ...parse(inscrito) });
       }
+
+      let situacaoPagamentoRef = ref(firebaseDatabase, `inscritos/${inscrito.rede}/${inscrito.nome}/situacaoPagamento`);
+      await set(situacaoPagamentoRef, inscrito.situacaoPagamento.map(m => `${m.parcela}ª Parcela`));
     }
   }
 
@@ -137,13 +140,13 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
       let uuid = v4();
 
       await salvarComprovante(uuid, {
-        quemRecebeu: data.quemRecebeu
+        quemRecebeu: data.quemRecebeu,
       })
 
       await salvarInscritos({
-        tipoPagamento,
         referencia: uuid,
-        quemRecebeu: data.quemRecebeu
+        quemRecebeu: data.quemRecebeu,
+        tipoPagamento
       });
 
       await finalizarInscricao();
@@ -155,8 +158,7 @@ export const FinalizarModalInscrito = ({ inscritos }) => {
       return am
     }
 
-    let deparaValor = deparaValores[inscrito.cargo]
-    return am + (deparaValor / 4)
+    return am + inscrito.situacaoPagamento.reduce((acc, a) => acc + Number.parseFloat(a.valor), 0)
   }, 0.0);
 
   return <>

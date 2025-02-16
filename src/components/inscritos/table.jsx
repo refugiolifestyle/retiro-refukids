@@ -46,7 +46,7 @@ export default function TableInscritos({ inscritos, loading, columnsExtras, colu
     observacao: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
     criancas: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
     equipe: { value: null, matchMode: FilterMatchMode.IN },
-    situacaoPagamento: { value: null, matchMode: FilterMatchMode.IN },
+    situacaoPagamento: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
     foiAdotada: { value: null, matchMode: FilterMatchMode.IN },
     quemAdotou: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
   });
@@ -213,10 +213,13 @@ export default function TableInscritos({ inscritos, loading, columnsExtras, colu
         field="situacaoPagamento"
         filterField="situacaoPagamento"
         filter
-        filterElement={options => <MultiSelect filter value={options.value} options={['1ª Parcela', 'Todas parcelas']} onChange={(e) => options.filterCallback(e.value)} placeholder="Filtrar por Tipo do pagamento" className="p-column-filter" />}
+        filterElement={options => <MultiSelect filter value={options.value} options={['1ª Parcela', '2ª Parcela', '3ª Parcela', '4ª Parcela']} onChange={(e) => options.filterCallback(e.value)} placeholder="Filtrar por Tipo do pagamento" className="p-column-filter" />}
         showFilterMatchModes={false}
         filterPlaceholder="Filtrar por Pagamentos efetuados"
-        header="Pagamentos efetuados" />
+        header="Pagamentos efetuados"
+        body={inscrito => inscrito.situacaoPagamento && typeof inscrito.situacaoPagamento[0] === "string"
+          ? inscrito.situacaoPagamento.join(', ')
+          : inscrito.situacaoPagamento.map(m => `${m.parcela}ª Parcela`).join(', ')} />
       : null}
     {visibleColumns.includes('Comprovantes de pagamento')
       ? <Column

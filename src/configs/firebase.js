@@ -13,13 +13,13 @@ const firebaseConfig = {
 };
 
 const firebaseConfigTeste = {
-  apiKey: "AIzaSyCubXIEtjg0zndG5kEHvRFJoOK9S5Cct48",
-  authDomain: "retiro-teste.firebaseapp.com",
-  databaseURL: "https://retiro-teste-default-rtdb.firebaseio.com",
-  projectId: "retiro-teste",
-  storageBucket: "retiro-teste.appspot.com",
-  messagingSenderId: "693062890363",
-  appId: "1:693062890363:web:1f672f47092a049b64c3de"
+  apiKey: "AIzaSyBU9Ife0xr2r6y9ZGALgGk9bb3_IEfUAFQ",
+  authDomain: "teste-ff206.firebaseapp.com",
+  databaseURL: "https://teste-ff206-default-rtdb.firebaseio.com",
+  projectId: "teste-ff206",
+  storageBucket: "teste-ff206.firebasestorage.app",
+  messagingSenderId: "90362482679",
+  appId: "1:90362482679:web:01171f43fb26e3147528f2"
 };
 
 export const firebaseApp = initializeApp(firebaseConfig);

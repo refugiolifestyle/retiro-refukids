@@ -18,10 +18,21 @@ import { useRedesService } from "../../../services/useRedesService";
 import { useEquipesService } from "../../../services/useEquipesService";
 import { v4 } from 'uuid';
 import { useRouter } from 'next/router';
+import { useInscritoService } from '../../../services/useInscritoService';
+
+const deparaCargo = {
+  'SERVO': "Servo",
+  'CRIANCA': "Criança",
+  'RESPONSAVEL': "Responsável",
+  'CONVIDADO': "Convidado",
+}
 
 export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
   const redes = useRedesService();
   const equipes = useEquipesService();
+
+  const { getParcelasEmAberto } = useInscritoService();
+  const { pagamentos } = useConfigService();
 
   const { query } = useRouter();
   const { inscritos, loading } = useInscritosService();
@@ -29,7 +40,20 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
 
   const [visible, setVisible] = useState(false);
   const [tipoInscricao, setTipoInscricao] = useState(null);
-  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, watch, getValues, reset, formState: { errors } } = useForm();
+
+  const parcelasEmAberto = tipoInscricao
+    ? getParcelasEmAberto(pagamentos, {
+      ...getValues(),
+      cargo: deparaCargo[tipoInscricao]
+    })
+      .map(m => ({
+        label: `${m.parcela}ª Parcela`,
+        parcela: m.parcela,
+        disabled: m.valor == 0,
+        valor: m.valor
+      }))
+    : []
 
   const onSubmit = data => {
     switch (tipoInscricao) {
@@ -289,8 +313,9 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
                 <div className="flex flex-col sm:flex-row py-2">
                   <label className="text-base w-52">Pagamento *</label>
                   <div className="flex flex-1 flex-col">
-                    <SelectButton {...register('situacaoPagamento', { required: true })} options={['1ª Parcela']} value={watch('situacaoPagamento')} />
+                    <SelectButton {...register('situacaoPagamento', { required: true })} options={parcelasEmAberto} value={watch('situacaoPagamento')} multiple />
                     {errors.situacaoPagamento && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
+
                   </div>
                 </div>
                 <div className="flex flex-1 justify-end items-center mt-8">

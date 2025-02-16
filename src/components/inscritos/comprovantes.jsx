@@ -93,22 +93,23 @@ export const VisualizarComprovantesModal = ({ inscritos }) => {
                 </div>
                 <div className="flex flex-col sm:flex-row py-2">
                   <div className="flex flex-1 flex-col">
-                    <DataTable value={c.inscritos} size="small">
+                    <DataTable value={c.inscritos} dataKey='nome' size="small">
                       <Column field="rede" header="Rede"></Column>
-                      <Column 
-                        field="nome" 
+                      <Column
+                        field="nome"
                         header="Nome"
                         body={linha => <>
                           {linha.nome}
                           {
                             linha.cargo === 'Criança'
-                            && linha.foiAdotada === 'Sim'
-                            ? <Badge value="Adotada" severity="info" className='ml-2'></Badge>
-                            : null
+                              && linha.foiAdotada === 'Sim'
+                              ? <Badge value="Adotada" severity="info" className='ml-2'></Badge>
+                              : null
                           }
                         </>}></Column>
                       <Column field="cargo" header="Cargo"></Column>
-                      <Column field="situacaoPagamento" header="Pagamentos efetuados"></Column>
+                      <Column field="parcelas" header="Pagamentos efetuados"
+                        body={inscrito => inscrito.parcelas.map(m => `${m}ª Parcela`).join(', ')}></Column>
                     </DataTable>
                   </div>
                 </div>

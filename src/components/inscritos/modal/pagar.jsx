@@ -1,29 +1,40 @@
 import { get, ref, set } from 'firebase/database';
+import { ref as storageRef, uploadString } from 'firebase/storage';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { RadioButton } from 'primereact/radiobutton';
+import { SelectButton } from 'primereact/selectbutton';
 import { classNames } from 'primereact/utils';
 import { useEffect, useState } from "react";
 import { useForm } from 'react-hook-form';
 import { v4 } from 'uuid';
 import { firebaseDatabase, firebaseStorage } from '../../../configs/firebase';
 import { useConfigService } from '../../../services/useConfigService';
-import { uploadString, ref as storageRef } from 'firebase/storage';
+import { useInscritoService } from '../../../services/useInscritoService';
 
-const deparaValores = {
-  "Servo": 260,
-  "Criança": 170,
-  "Responsável": 270,
-  "Convidado": 0
-}
-
-export const Pagar2ParcelaModal = ({ inscritos, toast }) => {
+export const Pagar2ParcelaModal = ({ inscrito, toast }) => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tipoPagamento, setTipoPagamento] = useState(null);
-  const { permitirDinheiro, permitirPagamentoParcelas } = useConfigService();
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { permitirDinheiro, permitirPagamentoParcelas, pagamentos } = useConfigService();
+  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
+
+  const { getParcelasEmAberto } = useInscritoService();
+
+  const parcelasEmAberto = pagamentos && inscrito
+    ? getParcelasEmAberto(pagamentos, inscrito)
+      .map(m => ({
+        label: `${m.parcela}ª Parcela`,
+        valor: m.valor,
+        parcela: m.parcela,
+        disabled: m.valor == 0
+      }))
+    : []
+
+  const valorTotal = watch('situacaoPagamento') 
+    ? watch('situacaoPagamento').reduce((acc, p) => acc + Number.parseFloat(p.valor), 0)
+    : 0
 
   useEffect(() => {
     setTipoPagamento(null);
@@ -36,27 +47,22 @@ export const Pagar2ParcelaModal = ({ inscritos, toast }) => {
     setVisible(false);
   }
 
-  const salvarComprovante = async (uuid, pagamento) => {
+  const salvarComprovante = async (uuid, _pagamento) => {
     let comprovantePath = `comprovantes/${uuid}`;
     let comprovanteRef = ref(firebaseDatabase, comprovantePath);
 
+    let { parcelas, ...pagamento } = _pagamento
+
     await set(comprovanteRef, {
       tipoPagamento,
-      inscritos: inscritos.map(i => {
-        let newI = {
-          rede: i.rede,
-          nome: i.nome,
-          cargo: i.cargo,
-          situacaoPagamento: "2ª Parcela"
-        }
-
-        if (i.foiAdotada) {
-          newI.foiAdotada = i.foiAdotada
-        }
-
-        return newI
-      }),
-      valor: getAmount(),
+      inscritos: [{
+        rede: inscrito.rede,
+        nome: inscrito.nome,
+        cargo: inscrito.cargo,
+        foiAdotada: inscrito.foiAdotada || null,
+        parcelas: parcelas
+      }],
+      valor: valorTotal,
       data: new Date().toLocaleString("pt-BR"),
       ...pagamento
     });
@@ -65,23 +71,22 @@ export const Pagar2ParcelaModal = ({ inscritos, toast }) => {
   }
 
   const salvarInscritos = async (comprovante) => {
-    for (let inscrito of inscritos) {
-      let comprovanteRef = ref(firebaseDatabase, `inscritos/${inscrito.rede}/${inscrito.nome}/comprovante`);
-      let comprovanteGet = await get(comprovanteRef);
-      let comprovanteSaved = comprovanteGet.val();
+    let comprovanteRef = ref(firebaseDatabase, `inscritos/${inscrito.rede}/${inscrito.nome}/comprovante`);
+    let comprovanteGet = await get(comprovanteRef);
+    let comprovanteSaved = comprovanteGet.val();
 
-      await set(comprovanteRef, [
-        ...comprovanteSaved,
-        comprovante
-      ]);
+    let newCom = [
+      ...comprovanteSaved,
+      comprovante
+    ]
+    await set(comprovanteRef, newCom);
 
-      let situacaoPagamentoRef = ref(firebaseDatabase, `inscritos/${inscrito.rede}/${inscrito.nome}/situacaoPagamento`);
-      await set(situacaoPagamentoRef, "Todas parcelas");
-    }
+    let situacaoPagamentoRef = ref(firebaseDatabase, `inscritos/${inscrito.rede}/${inscrito.nome}/situacaoPagamento`);
+    await set(situacaoPagamentoRef, newCom.reduce((acc, c) => acc.concat(c.parcelas), []).map(m => `${m}ª Parcela`));
   }
 
   const finalizarInscricao = async () => {
-    toast.current.show({ severity: 'success', summary: 'Sucesso', detail: '2ª parcela paga com sucesso' });
+    toast.current.show({ severity: 'success', summary: 'Sucesso', detail: 'Parcelas pagas com sucesso' });
 
     setTimeout(() => {
       hideModal();
@@ -120,23 +125,21 @@ export const Pagar2ParcelaModal = ({ inscritos, toast }) => {
       let uuid = v4();
 
       await salvarComprovante(uuid, {
-        quemRecebeu: data.quemRecebeu
+        quemRecebeu: data.quemRecebeu,
+        parcelas: data.situacaoPagamento.map(m => m.parcela)
       })
 
       await salvarInscritos({
         referencia: uuid,
         quemRecebeu: data.quemRecebeu,
-        tipoPagamento
+        tipoPagamento,
+        parcelas: data.situacaoPagamento.map(m => m.parcela),
+        valor: valorTotal,
       });
 
       await finalizarInscricao();
     }
   }
-
-  let getAmount = () => inscritos.reduce((am, inscrito) => {
-    let deparaValor = deparaValores[inscrito.cargo]
-    return am + (deparaValor / 4)
-  }, 0.0);
 
   return <>
     {
@@ -144,25 +147,18 @@ export const Pagar2ParcelaModal = ({ inscritos, toast }) => {
         ? <Button
           text
           onClick={() => setVisible(true)}
-          label="2ª Parcela"
+          label="Pagar parcelas"
           icon="pi pi-wallet"
           className="bg-white text-black px-3 py-2 rounded-md text-sm font-medium" />
         : null
     }
     <Dialog
-      header="Pagamento da 2ª parcela"
+      header="Pagamento das parcelas"
       visible={visible}
+      onHide={() => hideModal()}
       breakpoints={{ '1300px': '80vw', '960px': '75vw', '960px': '75vw', '641px': '85vw', '300px': '95vw' }}
-      style={{ width: '50vw' }}
-      onHide={hideModal}>
+      style={{ width: '50vw' }}>
       <div className="flex flex-col sm:flex-row gap-6">
-        <label htmlFor="PixTipoId" className={classNames(
-          tipoPagamento === 'Pix' ? "border-indigo-700 font-semibold" : " border-indigo-100 font-light",
-          "flex flex-1 justify-center items-center gap-4 text-lg border-2 rounded-lg py-4 cursor-pointer "
-        )}>
-          <RadioButton inputId="PixTipoId" value="Pix" onChange={(e) => setTipoPagamento('Pix')} checked={tipoPagamento === 'Pix'} />
-          Pix
-        </label>
         {
           permitirDinheiro === true
             ? <label htmlFor="DinheiroTipoId" className={classNames(
@@ -175,11 +171,13 @@ export const Pagar2ParcelaModal = ({ inscritos, toast }) => {
             : null
         }
       </div>
+
       <form onSubmit={handleSubmit(concluirInscricao)} className='mt-4'>
         <div className="flex flex-col sm:flex-row py-2">
-          <label className="text-base font-semibold w-64">Valor total</label>
+          <label className="text-base font-semibold w-64">Parcelas à pagar</label>
           <div className="flex flex-1 flex-col">
-            {new Intl.NumberFormat('pt-BR', { style: "currency", currency: "BRL" }).format(getAmount())}
+            <SelectButton {...register('situacaoPagamento', { required: true })} options={parcelasEmAberto} value={watch('situacaoPagamento')} multiple />
+            {errors.situacaoPagamento && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
           </div>
         </div>
         {
@@ -204,6 +202,12 @@ export const Pagar2ParcelaModal = ({ inscritos, toast }) => {
             </div>
             : null
         }
+        <div className="flex flex-col sm:flex-row py-2">
+          <label className="text-base font-semibold w-64">Valor total</label>
+          <div className="flex flex-1 flex-col">
+            {new Intl.NumberFormat('pt-BR', { style: "currency", currency: "BRL" }).format(valorTotal)}
+          </div>
+        </div>
         {
           tipoPagamento !== null
             ?
