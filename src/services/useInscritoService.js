@@ -13,7 +13,9 @@ export const useInscritoService = () => {
       .map((p, i, a) => {
         return {
           parcela: p.parcela,
-          valor: ((pagamentos[inscrito.cargo].valor - valoresPagosDoInscrito) / a.length).toFixed(2)
+          valor: inscrito.cargo === "Servo"
+            ? Math.round((pagamentos[inscrito.cargo].valor - valoresPagosDoInscrito) / a.length)
+            : ((pagamentos[inscrito.cargo].valor - valoresPagosDoInscrito) / a.length).toFixed(2)
         }
       })
 

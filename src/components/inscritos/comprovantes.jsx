@@ -30,6 +30,10 @@ export const VisualizarComprovantesModal = ({ inscritos }) => {
     setVisible(false);
   }
 
+  if (!inscritos.comprovante) {
+    return null;
+  }
+
   return <>
     <Button
       text
