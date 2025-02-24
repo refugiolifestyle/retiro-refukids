@@ -9,7 +9,7 @@ export const useInscritoService = () => {
 
     let parcelasDoRetiroEmAbertoInscrito = pagamentos[inscrito.cargo]
       .parcelas
-      .filter(p => Date.now() < new Date(p.dataLimite).getTime() && !parcelasPagasDoInscrito.includes(p.parcela))
+      .filter(p => Date.now() < new Date(Date.parse(p.dataLimite) + 1000 * 60 * 60 * 3 /* +3h para compensar */).getTime() && !parcelasPagasDoInscrito.includes(p.parcela))
       .map((p, i, a) => {
         return {
           parcela: p.parcela,
