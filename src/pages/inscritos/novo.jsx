@@ -7,6 +7,7 @@ import TableInscritos from '../../components/inscritos/table';
 import { Page } from '../../components/page';
 import { useInscrito } from '../../hooks/useInscrito';
 import { Column } from 'primereact/column';
+import { Message } from 'primereact/message';
 
 const deparaCargo = {
   'SERVO': "Servo",
@@ -62,6 +63,7 @@ export default function Novo() {
           : null
       }
     </div>}>
+    <Message className='w-full mb-4' severity="warn" text="Atenção! Ao terminar de adicionar os inscritos, finalize sua inscrição." />
     <TableInscritos
       inscritos={inscritosAdded}
       loading={false}

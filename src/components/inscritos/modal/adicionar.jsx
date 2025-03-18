@@ -310,14 +310,6 @@ export const NovoModalInscrito = ({ adicionarInscrito, inscritosAdded }) => {
                     </>
                     : null
                 }
-                <div className="flex flex-col sm:flex-row py-2">
-                  <label className="text-base w-52">Pagamento *</label>
-                  <div className="flex flex-1 flex-col">
-                    <SelectButton {...register('situacaoPagamento', { required: true })} options={parcelasEmAberto} value={watch('situacaoPagamento')} multiple />
-                    {errors.situacaoPagamento && <span className="text-red-700 text-sm mt-1">Campo obrigatório</span>}
-
-                  </div>
-                </div>
                 <div className="flex flex-1 justify-end items-center mt-8">
                   <button
                     onClick={hideModal}
